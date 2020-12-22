@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'MobID'
-  s.version          = '0.1.0'
+  s.version          = '0.1.1'
   s.summary          = 'iOS SDK of MobID.'
 
 # This description is used to generate tags and improve search results.
@@ -32,12 +32,18 @@ TODO: Add long description of the pod here.
   s.swift_versions = ['4.0', '4.2', '5.0', '5.1']
 
   s.source_files = 'MobID/Classes/**/*'
+  s.resources = 'MobID/Assets/*.{xib,xcassets,png,jpg,otf,ttf}'
   
   # s.resource_bundles = {
   #   'MobID' => ['MobID/Assets/*.png']
   # }
 
   # s.public_header_files = 'Pod/Classes/**/*.h'
-  # s.frameworks = 'UIKit', 'MapKit'
-  # s.dependency 'AFNetworking', '~> 2.3'
+   s.frameworks = 'UIKit'
+   s.dependency 'Alamofire', '5.3'
+   s.dependency 'JitsiMeetSDK', '2.11.0'
+   s.dependency 'ALCameraViewController', '3.1'
+
+   s.pod_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
+   s.user_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
 end
