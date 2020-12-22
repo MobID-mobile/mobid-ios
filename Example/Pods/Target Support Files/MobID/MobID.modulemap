@@ -1,0 +1,6 @@
+framework module MobID {
+  umbrella header "MobID-umbrella.h"
+
+  export *
+  module * { export * }
+}

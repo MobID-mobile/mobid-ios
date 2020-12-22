@@ -1,0 +1,16 @@
+PODS:
+  - MobID (0.1.0)
+
+DEPENDENCIES:
+  - MobID (from `../`)
+
+EXTERNAL SOURCES:
+  MobID:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  MobID: 72a0b23b8c881b47cbced7c87f7edee3c366f533
+
+PODFILE CHECKSUM: aea63e25b2d9a7dc91163b552cfbbfa0e9a6d9a4
+
+COCOAPODS: 1.10.0
