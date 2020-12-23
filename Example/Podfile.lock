@@ -1,9 +1,7 @@
 PODS:
-  - Alamofire (5.3.0)
   - ALCameraViewController (3.1)
   - JitsiMeetSDK (2.11.0)
   - MobID (0.1.1):
-    - Alamofire (= 5.3)
     - ALCameraViewController (= 3.1)
     - JitsiMeetSDK (= 2.11.0)
 
@@ -11,9 +9,9 @@ DEPENDENCIES:
   - MobID (from `../`)
 
 SPEC REPOS:
-  trunk:
-    - Alamofire
+  https://github.com/CocoaPods/Specs.git:
     - ALCameraViewController
+  trunk:
     - JitsiMeetSDK
 
 EXTERNAL SOURCES:
@@ -21,10 +19,9 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  Alamofire: 2c792affbdc2f18016e08fdbcacd60aebe1ba593
   ALCameraViewController: 144dea45fd749a623aafd8cb7b10cea88499fcc3
   JitsiMeetSDK: ddc915b751b0166aa4fdfee938bd60cc87aff9f3
-  MobID: 978c4214e3cba849e2b918127a6e6fe9c7a0c9ff
+  MobID: 640e9f031805a7091ce84aed3b3c7eebf5bd7fc4
 
 PODFILE CHECKSUM: 7b5e3f37378dfa41988503d16403cbb34719faad
 

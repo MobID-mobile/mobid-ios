@@ -40,7 +40,6 @@ TODO: Add long description of the pod here.
 
   # s.public_header_files = 'Pod/Classes/**/*.h'
    s.frameworks = 'UIKit'
-   s.dependency 'Alamofire', '5.3'
    s.dependency 'JitsiMeetSDK', '2.11.0'
    s.dependency 'ALCameraViewController', '3.1'
 

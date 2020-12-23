@@ -5,10 +5,11 @@ import Foundation
 enum EndpointRouter: HTTPEndpoint {
 
   static var host: String?
-  static var token: String?
-  static var id: String?
+  static var token: String = ""
+  static var id: String = ""
 
-  case verification(parameters: HTTPParameters)
+  case auth(parameters: HTTPParameters)
+  case verification
 }
 
 extension EndpointRouter {
@@ -31,35 +32,45 @@ extension EndpointRouter {
 
   var queryItems: HTTPQueryItems? {
     switch self {
-    case .verification:
+    case .auth, .verification:
       return nil
     }
   }
 
   var path: String {
     switch self {
-    case .verification:
+    case .auth:
       return "/api/v1.1/verifications/"
+    case .verification:
+      return "/api/v1.1/verifications/" + Self.id + "/"
 
     }
   }
 
   var method: HTTPMethod {
     switch self {
-    case .verification:
+    case .auth:
       return .post
+    case .verification:
+      return .get
     }
   }
 
   var params: HTTPParameters? {
     switch self {
-    case let .verification(parameters):
+    case let .auth(parameters):
       return parameters
-
+    case .verification:
+      return nil
     }
   }
 
   var headers: HTTPHeaders {
-    return [:]
+    switch self {
+    case .auth:
+      return [:]
+    case .verification:
+      return ["authorization": "Bearer \(Self.token)"]
+    }
   }
 }

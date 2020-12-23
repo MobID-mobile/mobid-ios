@@ -12,8 +12,8 @@ public class HelloViewController: UIViewController {
   }
 
   // MARK: - Private
-
   private let networkClient = Client()
+
   private lazy var spinner: UIActivityIndicatorView = {
     let view = UIActivityIndicatorView(style: .gray)
     view.hidesWhenStopped = true
@@ -59,7 +59,7 @@ public class HelloViewController: UIViewController {
   // MARK: - Actions
   @objc private func didTapStartButton() {
     spinner.startAnimating()
-    networkClient.verification { [weak self] response in
+    networkClient.auth { [weak self] response in
       DispatchQueue.main.async {
         guard let self = self else { return }
         self.spinner.stopAnimating()

@@ -6,9 +6,10 @@ import ALCameraViewController
 class HomeViewController: UIViewController {
 
   // MARK: - Private
-  private lazy var jitsiMeetViewController = JitsiViewController()
+  private let networkClient = Client()
   private var conferenceCompletionPollingTimer: Timer?
 
+  private lazy var jitsiMeetViewController = JitsiViewController()
   private lazy var progressLabel: UILabel = {
     return UILabel()
   }()
@@ -29,7 +30,7 @@ class HomeViewController: UIViewController {
 
     jitsiMeetViewController.joint()
 
-    setupConferenceCompletionPolling()
+    setupVerificationUpdateTimer()
   }
 
   deinit {
@@ -105,7 +106,7 @@ class HomeViewController: UIViewController {
     ])
   }
   
-  private func presentALCameraView(for photoType: LegacyNetworkClient.PhotoType) {
+  private func presentALCameraView(for photoType: PhotoType) {
     DispatchQueue.main.async {
       let cameraViewController = CameraViewController(
         croppingParameters:
@@ -127,7 +128,7 @@ class HomeViewController: UIViewController {
     }
   }
 
-  private func processCameraOutput(image: UIImage?, photoType: LegacyNetworkClient.PhotoType) {
+  private func processCameraOutput(image: UIImage?, photoType: PhotoType) {
     guard let image = image, let imageData = image.pngData() else {
       jitsiMeetViewController.joint()
       return
@@ -135,64 +136,61 @@ class HomeViewController: UIViewController {
 
     progressLabel.isHidden = false
     view.bringSubviewToFront(progressLabel)
-    LegacyNetworkClient.sendPhoto(imageData, type: photoType) { [weak self] result in
-      DispatchQueue.main.async {
-        guard let self = self else { return }
-        switch result {
-        case .success:
-          break
-        case .failure:
-          self.showErrorAlert()
-        }
-        self.progressLabel.isHidden = true
-        self.jitsiMeetViewController.joint()
-      }
-    }
+//    LegacyNetworkClient.sendPhoto(imageData, type: photoType) { [weak self] result in
+//      DispatchQueue.main.async {
+//        guard let self = self else { return }
+//        switch result {
+//        case .success:
+//          break
+//        case .failure:
+//          self.showErrorAlert()
+//        }
+//        self.progressLabel.isHidden = true
+//        self.jitsiMeetViewController.joint()
+//      }
+//    }
   }
   
   // MARK: - Actions
   @objc func didTapSelfieButton() {
     jitsiMeetViewController.leave { [weak self] in
-      self?.presentALCameraView(for: .selfie)
+      self?.presentALCameraView(for: .SELFIE)
     }
   }
 
   @objc func didTapIdButton() {
     jitsiMeetViewController.leave { [weak self] in
-      self?.presentALCameraView(for: .passport)
+      self?.presentALCameraView(for: .PASSPORT)
     }
   }
 
   @objc func didTapSelfieWithIdButton() {
     jitsiMeetViewController.leave { [weak self] in
-      self?.presentALCameraView(for: .photowdoc)
+      self?.presentALCameraView(for: .SELFIE_WITH_PASSPORT)
     }
   }
 }
 
 private extension HomeViewController {
-  func setupConferenceCompletionPolling() {
+  func setupVerificationUpdateTimer() {
     conferenceCompletionPollingTimer = Timer.scheduledTimer(
       withTimeInterval: 3,
       repeats: true,
       block: { [weak self] timer in
-      LegacyNetworkClient.getSession { (result) in
+        self?.networkClient.verification { response in
         guard let self = self else { return }
-        switch result {
-        case .success(let dictionary):
-          if let conferenceCompleted = dictionary["conference_verification_completed"] as? Bool,
-             conferenceCompleted == true {
-            timer.invalidate()
-            self.jitsiMeetViewController.leave(completion: nil)
-
-            self.navigationController?.pushViewController(
-              ByeViewController(
-                dValue: self.convertToFloat(dictionary["document_score"]),
-                fValue: self.convertToFloat(dictionary["facial_match"]),
-                lValue: self.convertToFloat(dictionary["liveness_score"])
-              ),
-              animated: true)
-          }
+        switch response.result {
+        case let .success(verification):
+          break
+//            timer.invalidate()
+//            self.jitsiMeetViewController.leave(completion: nil)
+//            self.navigationController?.pushViewController(
+//              ByeViewController(
+//                dValue: self.convertToFloat(dictionary["document_score"]),
+//                fValue: self.convertToFloat(dictionary["facial_match"]),
+//                lValue: self.convertToFloat(dictionary["liveness_score"])
+//              ),
+//              animated: true)
         case .failure:
           break
         }

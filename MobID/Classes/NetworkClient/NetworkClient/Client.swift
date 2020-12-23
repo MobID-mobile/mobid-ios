@@ -84,14 +84,22 @@ class Client {
 extension Client {
 
   @discardableResult
-  func verification(completion: @escaping (Response<Verification>) -> Void) -> URLSessionDataTask? {
+  func auth(completion: @escaping (Response<Verification>) -> Void) -> URLSessionDataTask? {
 
     return perform(
-      EndpointRouter.verification(
+      EndpointRouter.auth(
         parameters: [
           "status": "WAIT_INVITE"
         ]
       ),
+      completion: completion)
+  }
+
+  @discardableResult
+  func verification(completion: @escaping (Response<Verification>) -> Void) -> URLSessionDataTask? {
+
+    return perform(
+      EndpointRouter.verification,
       completion: completion)
   }
 }
