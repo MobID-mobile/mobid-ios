@@ -2,7 +2,7 @@
 
 import Foundation
 
-struct Verification: Codable {
+struct Auth: Codable {
   let verificationID: String
   let status: VerificationStatus
   let isActive, isVerifiedByAgent: Bool?
@@ -10,7 +10,8 @@ struct Verification: Codable {
   let documentData, createdAt, updatedAt: String
   let images: [String]
   let conference: String?
-  
+  let token: String
+
   enum CodingKeys: String, CodingKey {
     case verificationID = "verification_id"
     case status
@@ -20,6 +21,6 @@ struct Verification: Codable {
     case documentData = "document_data"
     case createdAt = "created_at"
     case updatedAt = "updated_at"
-    case images, conference
+    case images, conference, token
   }
 }

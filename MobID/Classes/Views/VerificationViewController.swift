@@ -3,7 +3,7 @@
 import UIKit
 import ALCameraViewController
 
-class HomeViewController: UIViewController {
+class VerificationViewController: UIViewController {
 
   // MARK: - Private
   private let networkClient = Client()
@@ -85,14 +85,6 @@ class HomeViewController: UIViewController {
       selfieWithIdButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 24),
     ])
 
-//    spinner.translatesAutoresizingMaskIntoConstraints = false
-//    view.addSubview(spinner)
-//
-//    NSLayoutConstraint.activate([
-//      spinner.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-//      spinner.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 0),
-//    ])
-
     progressLabel.text = "Відправляємо фото..."
     progressLabel.sizeToFit()
     progressLabel.textColor = UIColor.brandColor
@@ -171,7 +163,7 @@ class HomeViewController: UIViewController {
   }
 }
 
-private extension HomeViewController {
+private extension VerificationViewController {
   func setupVerificationUpdateTimer() {
     conferenceCompletionPollingTimer = Timer.scheduledTimer(
       withTimeInterval: 3,
@@ -185,7 +177,7 @@ private extension HomeViewController {
 //            timer.invalidate()
 //            self.jitsiMeetViewController.leave(completion: nil)
 //            self.navigationController?.pushViewController(
-//              ByeViewController(
+//              EndViewController(
 //                dValue: self.convertToFloat(dictionary["document_score"]),
 //                fValue: self.convertToFloat(dictionary["facial_match"]),
 //                lValue: self.convertToFloat(dictionary["liveness_score"])

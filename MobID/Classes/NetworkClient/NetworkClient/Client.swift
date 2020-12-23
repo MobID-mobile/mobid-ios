@@ -84,7 +84,7 @@ class Client {
 extension Client {
 
   @discardableResult
-  func auth(completion: @escaping (Response<Verification>) -> Void) -> URLSessionDataTask? {
+  func auth(completion: @escaping (Response<Auth>) -> Void) -> URLSessionDataTask? {
 
     return perform(
       EndpointRouter.auth(

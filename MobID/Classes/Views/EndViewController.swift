@@ -2,7 +2,7 @@
 
 import UIKit
 
-class ByeViewController: UIViewController {
+class EndViewController: UIViewController {
 
   // MARK: - Init
   init(dValue: Float, fValue: Float, lValue: Float) {

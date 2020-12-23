@@ -2,7 +2,7 @@
 
 import UIKit
 
-public class HelloViewController: UIViewController {
+public class StartViewController: UIViewController {
 
   // MARK: - Override
   public override func viewDidLoad() {
@@ -64,10 +64,10 @@ public class HelloViewController: UIViewController {
         guard let self = self else { return }
         self.spinner.stopAnimating()
         switch response.result {
-        case let .success(verification):
+        case let .success(auth):
 
-          EndpointRouter.token = verification.token
-          EndpointRouter.id = verification.verificationID
+          EndpointRouter.token = auth.token
+          EndpointRouter.id = auth.verificationID
 
           self.push()
         case .failure(_):
@@ -79,9 +79,9 @@ public class HelloViewController: UIViewController {
 
   private func push() {
     guard let navController = navigationController else {
-      assertionFailure("HelloViewController should be in a navigation stack")
+      assertionFailure("StartViewController should be in a navigation stack")
       return
     }
-    navController.pushViewController(HomeViewController(), animated: true)
+    navController.pushViewController(VerificationViewController(), animated: true)
   }
 }
