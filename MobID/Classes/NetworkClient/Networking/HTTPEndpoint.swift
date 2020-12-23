@@ -36,6 +36,7 @@ extension HTTPEndpoint {
 
     var request = URLRequest(url: url)
     request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+    request.setValue("application/json", forHTTPHeaderField: "Accept")
     request.httpBody = try params.map { try JSONSerialization.data(withJSONObject: $0) }
     request.httpMethod = method.rawValue
 

@@ -5,7 +5,7 @@ import Alamofire
 
 typealias ResponseType = [String: AnyObject]
 
-class NetworkClient {
+class LegacyNetworkClient {
 
   // MARK: - Private
   private enum C {
@@ -120,7 +120,7 @@ class NetworkClient {
 }
 
 // MARK: - Private
-private extension NetworkClient {
+private extension LegacyNetworkClient {
   static func setCheckID(from response: [String: AnyObject]) {
     guard let anyId = response["id"], let id = anyId as? String else {
       return

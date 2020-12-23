@@ -6,7 +6,7 @@ import ALCameraViewController
 class HomeViewController: UIViewController {
 
   // MARK: - Private
-  private lazy var jitsiMeetViewController = JitsiViewController.make()
+  private lazy var jitsiMeetViewController = JitsiViewController()
   private var conferenceCompletionPollingTimer: Timer?
 
   private lazy var progressLabel: UILabel = {
@@ -105,7 +105,7 @@ class HomeViewController: UIViewController {
     ])
   }
   
-  private func presentALCameraView(for photoType: NetworkClient.PhotoType) {
+  private func presentALCameraView(for photoType: LegacyNetworkClient.PhotoType) {
     DispatchQueue.main.async {
       let cameraViewController = CameraViewController(
         croppingParameters:
@@ -127,7 +127,7 @@ class HomeViewController: UIViewController {
     }
   }
 
-  private func processCameraOutput(image: UIImage?, photoType: NetworkClient.PhotoType) {
+  private func processCameraOutput(image: UIImage?, photoType: LegacyNetworkClient.PhotoType) {
     guard let image = image, let imageData = image.pngData() else {
       jitsiMeetViewController.joint()
       return
@@ -135,7 +135,7 @@ class HomeViewController: UIViewController {
 
     progressLabel.isHidden = false
     view.bringSubviewToFront(progressLabel)
-    NetworkClient.sendPhoto(imageData, type: photoType) { [weak self] result in
+    LegacyNetworkClient.sendPhoto(imageData, type: photoType) { [weak self] result in
       DispatchQueue.main.async {
         guard let self = self else { return }
         switch result {
@@ -176,7 +176,7 @@ private extension HomeViewController {
       withTimeInterval: 3,
       repeats: true,
       block: { [weak self] timer in
-      NetworkClient.getSession { (result) in
+      LegacyNetworkClient.getSession { (result) in
         guard let self = self else { return }
         switch result {
         case .success(let dictionary):

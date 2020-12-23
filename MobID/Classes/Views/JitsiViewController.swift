@@ -42,6 +42,10 @@ class JitsiViewController: UIViewController, JitsiMeetViewDelegate {
     jitsiView.delegate = self
   }
 
+  override func loadView() {
+    view = JitsiMeetView()
+  }
+
   // MARK: - JitsiMeetViewDelegate
   func conferenceJoined(_ data: [AnyHashable : Any]!) {
     connected = true
@@ -54,11 +58,11 @@ class JitsiViewController: UIViewController, JitsiMeetViewDelegate {
 }
 
 // MARK: - Make
-extension JitsiViewController {
-  static func make() -> JitsiViewController {
-    let bundle = Bundle(for: JitsiViewController.self)
-    let storyboard = UIStoryboard(name: "Main", bundle: bundle)
-    return storyboard.instantiateInitialViewController() as! JitsiViewController
-  }
-}
+//extension JitsiViewController {
+//  static func make() -> JitsiViewController {
+//    let bundle = Bundle(for: JitsiViewController.self)
+//    let storyboard = UIStoryboard(name: "Main", bundle: bundle)
+//    return storyboard.instantiateInitialViewController() as! JitsiViewController
+//  }
+//}
 

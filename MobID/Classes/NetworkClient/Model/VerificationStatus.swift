@@ -2,7 +2,7 @@
 
 import Foundation
 
-enum ConnectionStatus: String {
+enum VerificationStatus: String, Codable {
   case WAIT_INVITE
   case CONFERENCE_START
   case SELFIE_START

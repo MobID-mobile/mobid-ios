@@ -12,6 +12,8 @@ public class HelloViewController: UIViewController {
   }
 
   // MARK: - Private
+
+  private let networkClient = Client()
   private lazy var spinner: UIActivityIndicatorView = {
     let view = UIActivityIndicatorView(style: .gray)
     view.hidesWhenStopped = true
@@ -57,18 +59,29 @@ public class HelloViewController: UIViewController {
   // MARK: - Actions
   @objc private func didTapStartButton() {
     spinner.startAnimating()
-    NetworkClient.auth { [weak self] result in
+    networkClient.verification { [weak self] response in
       DispatchQueue.main.async {
         guard let self = self else { return }
-
         self.spinner.stopAnimating()
-        switch result {
-        case .success:
-          self.navigationController?.pushViewController(HomeViewController(), animated: true)
+        switch response.result {
+        case let .success(verification):
+
+          EndpointRouter.token = verification.token
+          EndpointRouter.id = verification.verificationID
+
+          self.push()
         case .failure(_):
           self.showErrorAlert()
         }
       }
     }
+  }
+
+  private func push() {
+    guard let navController = navigationController else {
+      assertionFailure("HelloViewController should be in a navigation stack")
+      return
+    }
+    navController.pushViewController(HomeViewController(), animated: true)
   }
 }
