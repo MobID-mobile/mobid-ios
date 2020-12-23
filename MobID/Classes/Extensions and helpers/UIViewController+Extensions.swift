@@ -1,9 +1,5 @@
-//
-//  UIAlertController+MOBID.swift
-//  MobID
-//
 //  Created by admin on 10.12.2020.
-//
+
 
 import UIKit
 

@@ -1,9 +1,4 @@
-//
-//  HelloViewController.swift
-//  MobID
-//
 //  Created by admin on 09.12.2020.
-//
 
 import UIKit
 

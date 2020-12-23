@@ -1,9 +1,4 @@
-//
-//  JitsiViewController.swift
-//  MobID
-//
 //  Created by admin on 04.12.2020.
-//
 
 import UIKit
 import JitsiMeet

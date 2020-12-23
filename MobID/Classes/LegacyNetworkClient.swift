@@ -1,9 +1,4 @@
-//
-//  NetworkClient.swift
-//  MobID
-//
 //  Created by admin on 10.12.2020.
-//
 
 import Foundation
 import Alamofire
@@ -72,7 +67,7 @@ class NetworkClient {
                         type: PhotoType,
                         completion: ((Result<ResponseType, Error>) -> Void)?) {
     let urlString: String = C.hostAddress + C.assets + type.rawValue
-    let headers: HTTPHeaders = [
+    let headers: Alamofire.HTTPHeaders = [
       "authorization": "Bearer " + token,
       "Content-Type": "application/json"
     ]
@@ -99,7 +94,7 @@ class NetworkClient {
 
   static func getSession(completion: ((Result<ResponseType, Error>) -> Void)?) {
     let urlString: String = C.hostAddress
-    let headers: HTTPHeaders = [
+    let headers: Alamofire.HTTPHeaders = [
       "authorization": "Bearer " + token,
       "Content-Type": "application/json"
     ]
