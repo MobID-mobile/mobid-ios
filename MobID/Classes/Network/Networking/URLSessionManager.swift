@@ -36,4 +36,28 @@ class URLSessionManager {
     
     return dataTask
   }
+
+  @discardableResult
+  func upload(request: URLRequest,
+              form: Data,
+              completion: @escaping (SessionManagerResponse) -> Void) -> URLSessionUploadTask {
+
+      let task = session.uploadTask(with: request, from: form) { data, response, error in
+        let sessionManagerResponse: SessionManagerResponse
+        if let response = response as? HTTPURLResponse {
+          sessionManagerResponse = .init(
+            result: .success((data, response)),
+            request: request)
+        } else {
+          sessionManagerResponse = .init(
+            result: .failure(URLSessionError(urlError: error)),
+            request: request)
+        }
+        completion(sessionManagerResponse)
+      }
+
+      task.resume()
+
+      return task
+  }
 }

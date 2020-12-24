@@ -10,6 +10,7 @@ enum EndpointRouter: HTTPEndpoint {
 
   case auth(parameters: HTTPParameters)
   case verification
+  case photo(parameters: HTTPParameters)
 }
 
 extension EndpointRouter {
@@ -32,7 +33,7 @@ extension EndpointRouter {
 
   var queryItems: HTTPQueryItems? {
     switch self {
-    case .auth, .verification:
+    case .auth, .verification, .photo:
       return nil
     }
   }
@@ -43,13 +44,16 @@ extension EndpointRouter {
       return "/api/v1.1/verifications/"
     case .verification:
       return "/api/v1.1/verifications/" + Self.id + "/"
+    case .photo:
+      return "/api/v1.1/verifications/" + Self.id + "/images/"
 
     }
   }
 
   var method: HTTPMethod {
     switch self {
-    case .auth:
+    case .auth,
+         .photo:
       return .post
     case .verification:
       return .get
@@ -58,7 +62,8 @@ extension EndpointRouter {
 
   var params: HTTPParameters? {
     switch self {
-    case let .auth(parameters):
+    case let .auth(parameters),
+         let .photo(parameters):
       return parameters
     case .verification:
       return nil
@@ -69,7 +74,8 @@ extension EndpointRouter {
     switch self {
     case .auth:
       return [:]
-    case .verification:
+    case .verification,
+         .photo:
       return ["authorization": "Bearer \(Self.token)"]
     }
   }

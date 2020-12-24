@@ -136,26 +136,31 @@ private extension VerificationViewController {
   }
 
   func processCameraOutput(image: UIImage?, photoType: PhotoType) {
+    
     guard let image = image, let imageData = image.pngData() else {
-//      startJitsi()
+      self.showErrorAlert()
+      startJitsi()
       return
     }
 
     progressLabel.isHidden = false
     view.bringSubviewToFront(progressLabel)
-//    LegacyNetworkClient.sendPhoto(imageData, type: photoType) { [weak self] result in
-//      DispatchQueue.main.async {
-//        guard let self = self else { return }
-//        switch result {
-//        case .success:
-//          break
-//        case .failure:
-//          self.showErrorAlert()
-//        }
-//        self.progressLabel.isHidden = true
-//        self.startJitsi()
-//      }
-//    }
+
+//    let strBase64 = imageData.base64EncodedString(options: .lineLength64Characters)
+    networkClient.photo(image: image, type: photoType) { [weak self] response in
+      DispatchQueue.main.async {
+        guard let self = self else { return }
+        switch response.result {
+        case .success:
+          print("here")
+        case let .failure(error):
+          print(error.localizedDescription)
+          self.showErrorAlert()
+        }
+        self.progressLabel.isHidden = true
+        self.startJitsi()
+      }
+    }
   }
 
   func setupVerificationUpdateTimer() {
