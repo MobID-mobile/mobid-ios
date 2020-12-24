@@ -9,7 +9,7 @@ struct Verification: Codable {
   let score: Score
   let documentData, createdAt, updatedAt: String
   let images: [String]
-  let conference: String?
+  let conference: Conference?
   
   enum CodingKeys: String, CodingKey {
     case verificationID = "verification_id"

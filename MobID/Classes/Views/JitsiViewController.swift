@@ -5,6 +5,11 @@ import JitsiMeet
 
 class JitsiViewController: UIViewController, JitsiMeetViewDelegate {
 
+  // MARK: - Nested
+  private enum C {
+    static let host: URL = URL(string: "https://jitsi.mobid.ai/")!
+  }
+
   // MARK: - Private
   private var jitsiView: JitsiMeetView {
     return view as! JitsiMeetView
@@ -12,7 +17,7 @@ class JitsiViewController: UIViewController, JitsiMeetViewDelegate {
 
   private var leaveCompletion: (() -> Void)?
   private var connected: Bool = false
-  
+
   // MARK: - Interface
   func leave(completion: (() -> Void)?) {
     leaveCompletion = completion
@@ -24,13 +29,13 @@ class JitsiViewController: UIViewController, JitsiMeetViewDelegate {
     }
   }
 
-  func joint() {
+  func join(room: String?) {
     let jitsiMeetConferenceOptions = JitsiMeetConferenceOptions.fromBuilder { (builder) in
-      builder.serverURL = URL(string: "https://jitsi.mobid.ai/")!
+      builder.serverURL = C.host
       builder.audioOnly = false
 //      builder.audioMuted = true
 //      builder.videoMuted = true
-      builder.room = "test"
+      builder.room = room
     }
 
     jitsiView.join(jitsiMeetConferenceOptions)
@@ -45,8 +50,10 @@ class JitsiViewController: UIViewController, JitsiMeetViewDelegate {
   override func loadView() {
     view = JitsiMeetView()
   }
+}
 
-  // MARK: - JitsiMeetViewDelegate
+// MARK: - JitsiMeetViewDelegate
+extension JitsiViewController {
   func conferenceJoined(_ data: [AnyHashable : Any]!) {
     connected = true
   }
@@ -56,13 +63,3 @@ class JitsiViewController: UIViewController, JitsiMeetViewDelegate {
     leaveCompletion?()
   }
 }
-
-// MARK: - Make
-//extension JitsiViewController {
-//  static func make() -> JitsiViewController {
-//    let bundle = Bundle(for: JitsiViewController.self)
-//    let storyboard = UIStoryboard(name: "Main", bundle: bundle)
-//    return storyboard.instantiateInitialViewController() as! JitsiViewController
-//  }
-//}
-

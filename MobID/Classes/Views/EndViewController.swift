@@ -115,6 +115,7 @@ class EndViewController: UIViewController {
     return label
   }()
 
+  // MARK: - Subviews management
   private func addSubviews() {
 
     let imageView = UIImageView(image: UIImage.logo)

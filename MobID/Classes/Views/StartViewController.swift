@@ -21,6 +21,7 @@ public class StartViewController: UIViewController {
     return view
   }()
 
+  // MARK: - Subviews management
   private func addSubviews() {
 
     let imageView = UIImageView(image: UIImage.logo)
@@ -76,12 +77,16 @@ public class StartViewController: UIViewController {
       }
     }
   }
+}
 
-  private func push() {
+// MARK: - Navigation
+private extension StartViewController {
+  func push() {
     guard let navController = navigationController else {
       assertionFailure("StartViewController should be in a navigation stack")
       return
     }
+
     navController.pushViewController(VerificationViewController(), animated: true)
   }
 }

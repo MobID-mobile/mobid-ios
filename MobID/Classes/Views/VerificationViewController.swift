@@ -3,23 +3,26 @@
 import UIKit
 import ALCameraViewController
 
+
 class VerificationViewController: UIViewController {
+
+  // MARK: - Nested
+//  enum Status {
+//    case waiting
+//    case started(room: String)
+//    case selfie
+//    case passport
+//    case selfieAndPassport
+//  }
 
   // MARK: - Private
   private let networkClient = Client()
   private var conferenceCompletionPollingTimer: Timer?
+  private var status: VerificationStatus?
+  private var room: String?
 
   private lazy var jitsiMeetViewController = JitsiViewController()
-  private lazy var progressLabel: UILabel = {
-    return UILabel()
-  }()
-
-//  private lazy var spinner: UIActivityIndicatorView = {
-//    let view = UIActivityIndicatorView(style: .large)
-//    view.hidesWhenStopped = true
-//
-//    return view
-//  }()
+  private var progressLabel: UILabel = UILabel()
 
   // MARK: - Override
   override func viewDidLoad() {
@@ -28,18 +31,25 @@ class VerificationViewController: UIViewController {
     addJitsiMeetView()
     assSubviews()
 
-    jitsiMeetViewController.joint()
-
     setupVerificationUpdateTimer()
   }
 
+  // MARK: - Init/deinit
   deinit {
     conferenceCompletionPollingTimer?.invalidate()
   }
   
-  // MARK: - Private
+  // MARK: - Subviews management
   private func addJitsiMeetView() {
     add(child: jitsiMeetViewController)
+
+    jitsiMeetViewController.view.translatesAutoresizingMaskIntoConstraints = false
+    NSLayoutConstraint.activate([
+      jitsiMeetViewController.view.topAnchor.constraint(equalTo: self.view.topAnchor),
+      jitsiMeetViewController.view.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
+      jitsiMeetViewController.view.rightAnchor.constraint(equalTo: self.view.rightAnchor),
+      jitsiMeetViewController.view.bottomAnchor.constraint(equalTo: self.view.bottomAnchor),
+    ])
   }
   
   private func assSubviews() {
@@ -98,7 +108,117 @@ class VerificationViewController: UIViewController {
     ])
   }
   
-  private func presentALCameraView(for photoType: PhotoType) {
+  // MARK: - Actions
+  @objc private func didTapSelfieButton() {
+    jitsiMeetViewController.leave { [weak self] in
+      self?.presentALCameraView(for: .SELFIE)
+    }
+  }
+
+  @objc private func didTapIdButton() {
+    jitsiMeetViewController.leave { [weak self] in
+      self?.presentALCameraView(for: .PASSPORT)
+    }
+  }
+
+  @objc private func didTapSelfieWithIdButton() {
+    jitsiMeetViewController.leave { [weak self] in
+      self?.presentALCameraView(for: .SELFIE_WITH_PASSPORT)
+    }
+  }
+}
+
+// MARK: - Logic
+private extension VerificationViewController {
+
+  func startJitsi() {
+    jitsiMeetViewController.join(room: room)
+  }
+
+  func processCameraOutput(image: UIImage?, photoType: PhotoType) {
+    guard let image = image, let imageData = image.pngData() else {
+//      startJitsi()
+      return
+    }
+
+    progressLabel.isHidden = false
+    view.bringSubviewToFront(progressLabel)
+//    LegacyNetworkClient.sendPhoto(imageData, type: photoType) { [weak self] result in
+//      DispatchQueue.main.async {
+//        guard let self = self else { return }
+//        switch result {
+//        case .success:
+//          break
+//        case .failure:
+//          self.showErrorAlert()
+//        }
+//        self.progressLabel.isHidden = true
+//        self.startJitsi()
+//      }
+//    }
+  }
+
+  func setupVerificationUpdateTimer() {
+    conferenceCompletionPollingTimer = Timer.scheduledTimer(
+      withTimeInterval: 3,
+      repeats: true,
+      block: { [weak self] timer in
+        self?.networkClient.verification { response in
+          DispatchQueue.main.async {
+            guard let self = self else { return }
+            switch response.result {
+            case let .success(verification):
+              guard self.status != verification.status else {
+                return
+              }
+              self.process(model: verification)
+            case .failure:
+              break
+            }
+          }
+        }
+      })
+  }
+
+  func process(model: Verification) {
+    status = model.status
+    switch (model.status) {
+    case (.WAIT_INVITE):
+      break
+    case (.CONFERENCE_START):
+      status = model.status
+      room = model.conference?.jitsiRoom
+      startJitsi()
+    case (.SELFIE_START):
+      break
+    case (.PASSPORT_PHOTO_START):
+      break
+    case (.SELFIE_WITH_PASSPORT_PHOTO_START):
+      break
+    }
+
+    //            timer.invalidate()
+    //            self.jitsiMeetViewController.leave(completion: nil)
+    //            self.navigationController?.pushViewController(
+    //              EndViewController(
+    //                dValue: self.convertToFloat(dictionary["document_score"]),
+    //                fValue: self.convertToFloat(dictionary["facial_match"]),
+    //                lValue: self.convertToFloat(dictionary["liveness_score"])
+    //              ),
+    //              animated: true)
+  }
+
+  func convertToFloat(_ value: AnyObject?) -> Float {
+    guard let string = value as? String, let float = Float(string) else {
+      return 0.0
+    }
+    return float
+  }
+}
+
+// MARK: - Navigation
+private extension VerificationViewController {
+  func presentALCameraView(for photoType: PhotoType) {
     DispatchQueue.main.async {
       let cameraViewController = CameraViewController(
         croppingParameters:
@@ -118,82 +238,5 @@ class VerificationViewController: UIViewController {
       }
       self.present(cameraViewController, animated: true, completion: nil)
     }
-  }
-
-  private func processCameraOutput(image: UIImage?, photoType: PhotoType) {
-    guard let image = image, let imageData = image.pngData() else {
-      jitsiMeetViewController.joint()
-      return
-    }
-
-    progressLabel.isHidden = false
-    view.bringSubviewToFront(progressLabel)
-//    LegacyNetworkClient.sendPhoto(imageData, type: photoType) { [weak self] result in
-//      DispatchQueue.main.async {
-//        guard let self = self else { return }
-//        switch result {
-//        case .success:
-//          break
-//        case .failure:
-//          self.showErrorAlert()
-//        }
-//        self.progressLabel.isHidden = true
-//        self.jitsiMeetViewController.joint()
-//      }
-//    }
-  }
-  
-  // MARK: - Actions
-  @objc func didTapSelfieButton() {
-    jitsiMeetViewController.leave { [weak self] in
-      self?.presentALCameraView(for: .SELFIE)
-    }
-  }
-
-  @objc func didTapIdButton() {
-    jitsiMeetViewController.leave { [weak self] in
-      self?.presentALCameraView(for: .PASSPORT)
-    }
-  }
-
-  @objc func didTapSelfieWithIdButton() {
-    jitsiMeetViewController.leave { [weak self] in
-      self?.presentALCameraView(for: .SELFIE_WITH_PASSPORT)
-    }
-  }
-}
-
-private extension VerificationViewController {
-  func setupVerificationUpdateTimer() {
-    conferenceCompletionPollingTimer = Timer.scheduledTimer(
-      withTimeInterval: 3,
-      repeats: true,
-      block: { [weak self] timer in
-        self?.networkClient.verification { response in
-        guard let self = self else { return }
-        switch response.result {
-        case let .success(verification):
-          break
-//            timer.invalidate()
-//            self.jitsiMeetViewController.leave(completion: nil)
-//            self.navigationController?.pushViewController(
-//              EndViewController(
-//                dValue: self.convertToFloat(dictionary["document_score"]),
-//                fValue: self.convertToFloat(dictionary["facial_match"]),
-//                lValue: self.convertToFloat(dictionary["liveness_score"])
-//              ),
-//              animated: true)
-        case .failure:
-          break
-        }
-      }
-    })
-  }
-
-  func convertToFloat(_ value: AnyObject?) -> Float {
-    guard let string = value as? String, let float = Float(string) else {
-      return 0.0
-    }
-    return float
   }
 }
