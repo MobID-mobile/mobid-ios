@@ -225,18 +225,26 @@ private extension VerificationViewController {
 private extension VerificationViewController {
   func presentALCameraView(for photoType: PhotoType) {
     DispatchQueue.main.async {
-      let cameraViewController = CameraViewController(
-        croppingParameters:
-          .init(
-            isEnabled: false,
-            allowResizing: false,
-            allowMoving: false,
-            minimumSize: CGSize(width: 100, height: 100))) { [weak self] image, asset in
+
+      let cameraCroppingParameters = CroppingParameters(
+        isEnabled: false,
+        allowResizing: false,
+        allowMoving: false,
+        minimumSize: CGSize(width: 100, height: 100)
+      )
+
+      let cameraViewCompletion: CameraViewCompletion = { [weak self] image, asset in
         guard let self = self else { return }
         self.dismiss(animated: true) {
           self.processCameraOutput(image: image, photoType: photoType)
         }
       }
+      let cameraViewController: UIViewController
+      #if targetEnvironment(simulator)
+      cameraViewController = CameraViewController.imagePickerViewController(croppingParameters: cameraCroppingParameters, completion: cameraViewCompletion)
+      #else
+      cameraViewController = CameraViewController(croppingParameters: cameraCroppingParameters, completion: cameraViewCompletion)
+      #endif
 
       if #available(iOS 13.0, *) {
         cameraViewController.isModalInPresentation = true
