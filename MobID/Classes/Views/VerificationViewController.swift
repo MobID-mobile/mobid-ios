@@ -146,13 +146,12 @@ private extension VerificationViewController {
     progressLabel.isHidden = false
     view.bringSubviewToFront(progressLabel)
 
-//    let strBase64 = imageData.base64EncodedString(options: .lineLength64Characters)
     networkClient.photo(image: image, type: photoType) { [weak self] response in
       DispatchQueue.main.async {
         guard let self = self else { return }
         switch response.result {
         case let .success(photo):
-          print("here")
+          print(photo)
         case let .failure(error):
           print(error.localizedDescription)
           self.showErrorAlert()

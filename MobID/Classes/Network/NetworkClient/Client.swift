@@ -46,42 +46,17 @@ class Client {
     }
   }
 
-  func performNew<T: Decodable>(_ request: URLRequest,
-                             completion: @escaping (Response<T>) -> Void) -> URLSessionDataTask? {
-    do {
-      return urlSessionManager.perform(request: request) { [weak self] response in
-        guard let self = self else { return }
-        self.queue.async {
-          let result: Result<T, ClientError> = response.result
-            .flatMap(ifSuccess: self.verifyServerResponse, ifFailure: self.networkErrorToResult)
-            .flatMap(ifSuccess: self.parseResult, ifFailure: liftError)
+  func performURLRequest<T: Decodable>(_ request: URLRequest,
+                                       completion: @escaping (Response<T>) -> Void) -> URLSessionDataTask? {
+    return urlSessionManager.perform(request: request) { [weak self] response in
+      guard let self = self else { return }
+      self.queue.async {
+        let result: Result<T, ClientError> = response.result
+          .flatMap(ifSuccess: self.verifyServerResponse, ifFailure: self.networkErrorToResult)
+          .flatMap(ifSuccess: self.parseResult, ifFailure: liftError)
 
-          completion(.init(result: result, request: request))
-        }
+        completion(.init(result: result, request: request))
       }
-    } catch {
-      completion(.init(result: .failure(.endpointError(error: error)), request: nil))
-      return nil
-    }
-  }
-
-  func performUpload<T: Decodable>(request: URLRequest,
-                                   form: Data,
-                                   completion: @escaping (Response<T>) -> Void) -> URLSessionDataTask? {
-    do {
-      return urlSessionManager.upload(request: request, form: form) { [weak self] response in
-        guard let self = self else { return }
-        self.queue.async {
-          let result: Result<T, ClientError> = response.result
-            .flatMap(ifSuccess: self.verifyServerResponse, ifFailure: self.networkErrorToResult)
-            .flatMap(ifSuccess: self.parseResult, ifFailure: liftError)
-
-          completion(.init(result: result, request: request))
-        }
-      }
-    } catch {
-      completion(.init(result: .failure(.endpointError(error: error)), request: nil))
-      return nil
     }
   }
 
@@ -149,26 +124,18 @@ extension Client {
     let photoEndpoint = EndpointRouter.photo(
       parameters: [
         "type": type.rawValue,
-//        "file": strBase64,
         "verification": EndpointRouter.id
       ]
     )
     let url = try! photoEndpoint.asURLRequest().url!
-    let logo = UIImage.testjpeg!
     let multipartRequest = try! MultipartRequest.make(
       url: url,
-      image: logo,
+      image: image,
       type: type.rawValue,
       verification: EndpointRouter.id,
       token: EndpointRouter.token
     )
 
-    print("here")
-    return performNew(multipartRequest.0, completion: completion)
-    //    return performUpload(request: )
-//    return perform(
-//      photoEndpoint,
-//      completion: completion
-//    )
+    return performURLRequest(multipartRequest.0, completion: completion)
   }
 }
