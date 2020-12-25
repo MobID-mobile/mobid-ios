@@ -46,6 +46,25 @@ class Client {
     }
   }
 
+  func performNew<T: Decodable>(_ request: URLRequest,
+                             completion: @escaping (Response<T>) -> Void) -> URLSessionDataTask? {
+    do {
+      return urlSessionManager.perform(request: request) { [weak self] response in
+        guard let self = self else { return }
+        self.queue.async {
+          let result: Result<T, ClientError> = response.result
+            .flatMap(ifSuccess: self.verifyServerResponse, ifFailure: self.networkErrorToResult)
+            .flatMap(ifSuccess: self.parseResult, ifFailure: liftError)
+
+          completion(.init(result: result, request: request))
+        }
+      }
+    } catch {
+      completion(.init(result: .failure(.endpointError(error: error)), request: nil))
+      return nil
+    }
+  }
+
   func performUpload<T: Decodable>(request: URLRequest,
                                    form: Data,
                                    completion: @escaping (Response<T>) -> Void) -> URLSessionDataTask? {
@@ -135,14 +154,17 @@ extension Client {
       ]
     )
     let url = try! photoEndpoint.asURLRequest().url!
+    let logo = UIImage.testjpeg!
     let multipartRequest = try! MultipartRequest.make(
       url: url,
-      image: image,
+      image: logo,
       type: type.rawValue,
-      verification: EndpointRouter.id
+      verification: EndpointRouter.id,
+      token: EndpointRouter.token
     )
 
-    return performUpload(request: multipartRequest.0, form: multipartRequest.1, completion: completion)
+    print("here")
+    return performNew(multipartRequest.0, completion: completion)
     //    return performUpload(request: )
 //    return perform(
 //      photoEndpoint,

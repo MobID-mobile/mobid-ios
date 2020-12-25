@@ -31,7 +31,7 @@ class VerificationViewController: UIViewController {
     addJitsiMeetView()
     assSubviews()
 
-    setupVerificationUpdateTimer()
+//    setupVerificationUpdateTimer()
   }
 
   // MARK: - Init/deinit
@@ -132,7 +132,7 @@ class VerificationViewController: UIViewController {
 private extension VerificationViewController {
 
   func startJitsi() {
-    jitsiMeetViewController.join(room: room)
+//    jitsiMeetViewController.join(room: room)
   }
 
   func processCameraOutput(image: UIImage?, photoType: PhotoType) {
@@ -151,7 +151,7 @@ private extension VerificationViewController {
       DispatchQueue.main.async {
         guard let self = self else { return }
         switch response.result {
-        case .success:
+        case let .success(photo):
           print("here")
         case let .failure(error):
           print(error.localizedDescription)

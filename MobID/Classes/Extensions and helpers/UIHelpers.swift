@@ -18,4 +18,8 @@ extension UIImage {
   static var logo: UIImage? {
     return UIImage(named: "logo", in: bundle, compatibleWith: nil)
   }
+
+  static var testjpeg: UIImage? {
+    return UIImage(named: "testjpeg", in: bundle, compatibleWith: nil)
+  }
 }
