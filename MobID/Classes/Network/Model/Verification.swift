@@ -6,7 +6,7 @@ struct Verification: Codable {
   let verificationID: String
   let status: VerificationStatus
   let isActive, isVerifiedByAgent: Bool?
-  let score: Score
+  let score: Score?
   let documentData, createdAt, updatedAt: String
   let images: [String]
   let conference: Conference?

@@ -8,4 +8,5 @@ enum VerificationStatus: String, Codable {
   case SELFIE_START
   case PASSPORT_PHOTO_START
   case SELFIE_WITH_PASSPORT_PHOTO_START
+  case CONFERENCE_STOPPED
 }

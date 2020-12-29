@@ -7,19 +7,32 @@ import ALCameraViewController
 class VerificationViewController: UIViewController {
 
   // MARK: - Nested
-//  enum Status {
-//    case waiting
-//    case started(room: String)
-//    case selfie
-//    case passport
-//    case selfieAndPassport
-//  }
+  //  enum Status {
+  //    case waiting
+  //    case started(room: String)
+  //    case selfie
+  //    case passport
+  //    case selfieAndPassport
+  //  }
 
   // MARK: - Private
   private let networkClient = Client()
   private var conferenceCompletionPollingTimer: Timer?
-  private var status: VerificationStatus?
+  private var status: VerificationStatus = .WAIT_INVITE
   private var room: String?
+
+  private lazy var actionButton: UIButton = {
+    let button = UIButton(type: .system)
+    button.setTitleColor(UIColor.brandColor, for: .normal)
+    button.backgroundColor = .white
+    button.setTitle("", for: .normal)
+    button.addTarget(self, action: #selector(didTapButton), for: .touchUpInside)
+
+    button.sizeToFit()
+    button.translatesAutoresizingMaskIntoConstraints = false
+    return button
+
+  }()
 
   private lazy var jitsiMeetViewController = JitsiViewController()
   private var progressLabel: UILabel = UILabel()
@@ -31,7 +44,7 @@ class VerificationViewController: UIViewController {
     addJitsiMeetView()
     assSubviews()
 
-//    setupVerificationUpdateTimer()
+    setupVerificationUpdateTimer()
   }
 
   // MARK: - Init/deinit
@@ -53,46 +66,13 @@ class VerificationViewController: UIViewController {
   }
   
   private func assSubviews() {
-    let selfieButton = UIButton(type: .system)
-    selfieButton.setTitleColor(UIColor.brandColor, for: .normal)
-    selfieButton.backgroundColor = .white
-    selfieButton.setTitle("Зробити селфі", for: .normal)
-    selfieButton.addTarget(self, action: #selector(didTapSelfieButton), for: .touchUpInside)
-    selfieButton.sizeToFit()
-    selfieButton.translatesAutoresizingMaskIntoConstraints = false
-    view.addSubview(selfieButton)
+    view.addSubview(actionButton)
+    actionButton.isHidden = true
     
     NSLayoutConstraint.activate([
-      selfieButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 24),
-      selfieButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 24),
-    ])
-
-    let idButton = UIButton(type: .system)
-    idButton.setTitleColor(UIColor.brandColor, for: .normal)
-    idButton.backgroundColor = .white
-    idButton.setTitle("Зробити фото паспорту", for: .normal)
-    idButton.addTarget(self, action: #selector(didTapIdButton), for: .touchUpInside)
-    idButton.sizeToFit()
-    idButton.translatesAutoresizingMaskIntoConstraints = false
-    view.addSubview(idButton)
-
-    NSLayoutConstraint.activate([
-      idButton.topAnchor.constraint(equalTo: selfieButton.bottomAnchor, constant: 16),
-      idButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 24),
-    ])
-
-    let selfieWithIdButton = UIButton(type: .system)
-    selfieWithIdButton.setTitleColor(UIColor.brandColor, for: .normal)
-    selfieWithIdButton.backgroundColor = .white
-    selfieWithIdButton.setTitle("Зробити селфі з паспортом", for: .normal)
-    selfieWithIdButton.addTarget(self, action: #selector(didTapSelfieWithIdButton), for: .touchUpInside)
-    selfieWithIdButton.sizeToFit()
-    selfieWithIdButton.translatesAutoresizingMaskIntoConstraints = false
-    view.addSubview(selfieWithIdButton)
-
-    NSLayoutConstraint.activate([
-      selfieWithIdButton.topAnchor.constraint(equalTo: idButton.bottomAnchor, constant: 16),
-      selfieWithIdButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 24),
+      actionButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 48),
+      actionButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 24),
+      actionButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor , constant: -24)
     ])
 
     progressLabel.text = "Відправляємо фото..."
@@ -106,24 +86,36 @@ class VerificationViewController: UIViewController {
       progressLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
       progressLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 30),
     ])
+
+    // "Зробити селфі"
+    // "Зробити фото паспорту"
+    // "Зробити селфі з паспортом"
   }
   
   // MARK: - Actions
-  @objc private func didTapSelfieButton() {
-    jitsiMeetViewController.leave { [weak self] in
-      self?.presentALCameraView(for: .SELFIE)
-    }
-  }
 
-  @objc private func didTapIdButton() {
+  @objc private func didTapButton() {
     jitsiMeetViewController.leave { [weak self] in
-      self?.presentALCameraView(for: .PASSPORT)
-    }
-  }
+      guard let self = self else { return }
 
-  @objc private func didTapSelfieWithIdButton() {
-    jitsiMeetViewController.leave { [weak self] in
-      self?.presentALCameraView(for: .SELFIE_WITH_PASSPORT)
+      var type: PhotoType?
+
+      switch self.status {
+      case .SELFIE_START:
+        type = .SELFIE
+      case .PASSPORT_PHOTO_START:
+        type = .PASSPORT
+      case .SELFIE_WITH_PASSPORT_PHOTO_START:
+        type = .SELFIE_WITH_PASSPORT
+      default:
+        break
+      }
+
+      guard let photoType = type else {
+        return
+      }
+
+      self.presentALCameraView(for: photoType)
     }
   }
 }
@@ -132,12 +124,12 @@ class VerificationViewController: UIViewController {
 private extension VerificationViewController {
 
   func startJitsi() {
-//    jitsiMeetViewController.join(room: room)
+    jitsiMeetViewController.join(room: room)
   }
 
   func processCameraOutput(image: UIImage?, photoType: PhotoType) {
     
-    guard let image = image, let imageData = image.pngData() else {
+    guard let image = image else {
       self.showErrorAlert()
       startJitsi()
       return
@@ -175,8 +167,10 @@ private extension VerificationViewController {
               guard self.status != verification.status else {
                 return
               }
+              self.status = verification.status
               self.process(model: verification)
-            case .failure:
+            case let .failure(error):
+              print(error)
               break
             }
           }
@@ -185,38 +179,64 @@ private extension VerificationViewController {
   }
 
   func process(model: Verification) {
-    status = model.status
-    switch (model.status) {
-    case (.WAIT_INVITE):
+    switch status {
+    case .WAIT_INVITE:
       break
-    case (.CONFERENCE_START):
-      status = model.status
+    case .CONFERENCE_START:
       room = model.conference?.jitsiRoom
       startJitsi()
-    case (.SELFIE_START):
+    case .SELFIE_START:
       break
-    case (.PASSPORT_PHOTO_START):
+    case .PASSPORT_PHOTO_START:
       break
-    case (.SELFIE_WITH_PASSPORT_PHOTO_START):
+    case .SELFIE_WITH_PASSPORT_PHOTO_START:
       break
+    case .CONFERENCE_STOPPED:
+      stopConference(model: model)
     }
 
-    //            timer.invalidate()
-    //            self.jitsiMeetViewController.leave(completion: nil)
-    //            self.navigationController?.pushViewController(
-    //              EndViewController(
-    //                dValue: self.convertToFloat(dictionary["document_score"]),
-    //                fValue: self.convertToFloat(dictionary["facial_match"]),
-    //                lValue: self.convertToFloat(dictionary["liveness_score"])
-    //              ),
-    //              animated: true)
+    changeActionButtonState()
   }
 
-  func convertToFloat(_ value: AnyObject?) -> Float {
-    guard let string = value as? String, let float = Float(string) else {
-      return 0.0
+  func stopConference(model: Verification) {
+
+    let dValue = model.score?.document
+    let fValue = model.score?.facialMatch
+    let lValue = model.score?.liveness
+
+    conferenceCompletionPollingTimer?.invalidate()
+    self.jitsiMeetViewController.leave(completion: nil)
+    self.navigationController?.pushViewController(
+      EndViewController(
+        dValue: dValue.flatMap { Float($0) },
+        fValue: fValue.flatMap { Float($0) },
+        lValue: lValue.flatMap { Float($0) }
+      ),
+      animated: true)
+  }
+
+  func changeActionButtonState() {
+
+    switch status {
+    case .WAIT_INVITE:
+      actionButton.isHidden = true
+      actionButton.setTitle("", for: .normal)
+    case .CONFERENCE_START:
+      actionButton.setTitle("", for: .normal)
+      actionButton.isHidden = true
+    case .SELFIE_START:
+      actionButton.setTitle("Зробити селфі", for: .normal)
+      actionButton.isHidden = false
+    case .PASSPORT_PHOTO_START:
+      actionButton.setTitle("Зробити фото паспорту", for: .normal)
+      actionButton.isHidden = false
+    case .SELFIE_WITH_PASSPORT_PHOTO_START:
+      actionButton.setTitle("Зробити селфі з паспортом", for: .normal)
+      actionButton.isHidden = false
+    case .CONFERENCE_STOPPED:
+      actionButton.isHidden = true
+      actionButton.setTitle("", for: .normal)
     }
-    return float
   }
 }
 

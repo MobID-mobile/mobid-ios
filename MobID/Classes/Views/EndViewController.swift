@@ -5,7 +5,7 @@ import UIKit
 class EndViewController: UIViewController {
 
   // MARK: - Init
-  init(dValue: Float, fValue: Float, lValue: Float) {
+  init(dValue: Float?, fValue: Float?, lValue: Float?) {
     self.dValue = dValue
     self.fValue = fValue
     self.lValue = lValue
@@ -23,13 +23,11 @@ class EndViewController: UIViewController {
     view.backgroundColor = .white
     addSubviews()
 
-    vDocumentScoreLabel.text = dValue.description + "%"
-    vFacialMatchLabel.text = fValue.description + "%"
-    vLivenessScoreLabel.text = lValue.description + "%"
+    show()
   }
 
   // MARK: - Private
-  private let dValue, fValue, lValue: Float
+  private let dValue, fValue, lValue: Float?
 
   private lazy var stackView: UIStackView = {
     let stackView = UIStackView()
@@ -202,5 +200,23 @@ class EndViewController: UIViewController {
       vStackView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -24),
       vStackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -150)
     ])
+  }
+
+  func show() {
+    guard
+      let dValue = dValue,
+      let fValue = fValue,
+      let lValue = lValue else {
+
+      vStackView.isHidden = true
+      stackView.isHidden = true
+      return
+    }
+    vStackView.isHidden = false
+    stackView.isHidden = false
+    vDocumentScoreLabel.text = dValue.description + "%"
+    vFacialMatchLabel.text = fValue.description + "%"
+    vLivenessScoreLabel.text = lValue.description + "%"
+
   }
 }

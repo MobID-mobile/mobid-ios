@@ -5,7 +5,8 @@ import Foundation
 // MARK: - Score
 struct Score: Codable {
   let scoreID: String
-  let document, facialMatch, liveness, isOcrRecognized: Float?
+  let document, facialMatch, liveness: String?
+  let isOcrRecognized: Bool?
 
   enum CodingKeys: String, CodingKey {
     case scoreID = "score_id"
