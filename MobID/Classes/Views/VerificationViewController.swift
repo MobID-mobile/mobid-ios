@@ -3,12 +3,11 @@
 import UIKit
 import ALCameraViewController
 
-
 class VerificationViewController: UIViewController {
 
   // MARK: - Private
   private let networkClient = Client()
-  private var conferenceCompletionPollingTimer: Timer?
+  private let conferenceStatusRequester = ConferenceStatusRequester()
   private var status: VerificationStatus = .WAIT_INVITE
   private var room: String?
 
@@ -26,21 +25,24 @@ class VerificationViewController: UIViewController {
   }()
 
   private lazy var jitsiMeetViewController = JitsiViewController()
-  private var progressLabel: UILabel = UILabel()
+  private lazy var progressLabel: UILabel = {
+    let label = UILabel()
+    label.text = "Відправляємо фото..."
+    label.sizeToFit()
+    label.textColor = UIColor.brandColor
+    label.translatesAutoresizingMaskIntoConstraints = false
+    label.isHidden = true
+    return label
+  }()
 
   // MARK: - Override
   override func viewDidLoad() {
     super.viewDidLoad()
     view.backgroundColor = .white
     addJitsiMeetView()
-    assSubviews()
+    addSubviews()
 
     setupVerificationUpdateTimer()
-  }
-
-  // MARK: - Init/deinit
-  deinit {
-    conferenceCompletionPollingTimer?.invalidate()
   }
   
   // MARK: - Subviews management
@@ -56,7 +58,7 @@ class VerificationViewController: UIViewController {
     ])
   }
   
-  private func assSubviews() {
+  private func addSubviews() {
     view.addSubview(actionButton)
     actionButton.isHidden = true
     
@@ -66,11 +68,6 @@ class VerificationViewController: UIViewController {
       actionButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor , constant: -24)
     ])
 
-    progressLabel.text = "Відправляємо фото..."
-    progressLabel.sizeToFit()
-    progressLabel.textColor = UIColor.brandColor
-    progressLabel.translatesAutoresizingMaskIntoConstraints = false
-    progressLabel.isHidden = true
     view.addSubview(progressLabel)
 
     NSLayoutConstraint.activate([
@@ -80,7 +77,6 @@ class VerificationViewController: UIViewController {
   }
   
   // MARK: - Actions
-
   @objc private func didTapButton() {
     jitsiMeetViewController.leave { [weak self] in
       guard let self = self else { return }
@@ -142,27 +138,21 @@ private extension VerificationViewController {
   }
 
   func setupVerificationUpdateTimer() {
-    conferenceCompletionPollingTimer = Timer.scheduledTimer(
-      withTimeInterval: 3,
-      repeats: true,
-      block: { [weak self] timer in
-        self?.networkClient.verification { response in
-          DispatchQueue.main.async {
-            guard let self = self else { return }
-            switch response.result {
-            case let .success(verification):
-              guard self.status != verification.status else {
-                return
-              }
-              self.status = verification.status
-              self.process(model: verification)
-            case let .failure(error):
-              print(error)
-              break
-            }
-          }
+    conferenceStatusRequester.start { [weak self] response in
+      guard let self = self else { return }
+
+      switch response.result {
+      case let .success(verification):
+        guard self.status != verification.status else {
+          return
         }
-      })
+        self.status = verification.status
+        self.process(model: verification)
+      case let .failure(error):
+        print(error)
+        break
+      }
+    }
   }
 
   func process(model: Verification) {
@@ -191,7 +181,7 @@ private extension VerificationViewController {
     let fValue = model.score?.facialMatch
     let lValue = model.score?.liveness
 
-    conferenceCompletionPollingTimer?.invalidate()
+    conferenceStatusRequester.stop()
     self.jitsiMeetViewController.leave(completion: nil)
     self.navigationController?.pushViewController(
       EndViewController(
@@ -205,12 +195,9 @@ private extension VerificationViewController {
   func changeActionButtonState() {
 
     switch status {
-    case .WAIT_INVITE:
+    case .WAIT_INVITE, .CONFERENCE_START, .CONFERENCE_STOPPED:
       actionButton.isHidden = true
       actionButton.setTitle("", for: .normal)
-    case .CONFERENCE_START:
-      actionButton.setTitle("", for: .normal)
-      actionButton.isHidden = true
     case .SELFIE_START:
       actionButton.setTitle("Зробити селфі", for: .normal)
       actionButton.isHidden = false
@@ -220,9 +207,6 @@ private extension VerificationViewController {
     case .SELFIE_WITH_PASSPORT_PHOTO_START:
       actionButton.setTitle("Зробити селфі з паспортом", for: .normal)
       actionButton.isHidden = false
-    case .CONFERENCE_STOPPED:
-      actionButton.isHidden = true
-      actionButton.setTitle("", for: .normal)
     }
   }
 }
