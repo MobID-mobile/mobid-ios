@@ -13,12 +13,33 @@ public class StartViewController: UIViewController {
 
   // MARK: - Private
   private let networkClient = Client()
+  private let conferenceStatusRequester = ConferenceStatusRequester()
 
   private lazy var spinner: UIActivityIndicatorView = {
     let view = UIActivityIndicatorView(style: .gray)
     view.hidesWhenStopped = true
 
     return view
+  }()
+
+  private lazy var waitingForAgentLabel: UILabel = {
+    let label = UILabel()
+    label.text = "Очікуємо підключення оператора"
+    label.sizeToFit()
+    label.textColor = UIColor.brandColor
+    label.translatesAutoresizingMaskIntoConstraints = false
+    label.isHidden = true
+    return label
+  }()
+
+  private lazy var actionButton: UIButton = {
+    let button = UIButton(type: .system)
+    button.setTitle("Почати відеодзвінок", for: .normal)
+    button.setTitleColor(UIColor.brandColor, for: .normal)
+    button.addTarget(self, action: #selector(didTapStartButton), for: .touchUpInside)
+    button.sizeToFit()
+    button.translatesAutoresizingMaskIntoConstraints = false
+    return button
   }()
 
   // MARK: - Subviews management
@@ -35,17 +56,11 @@ public class StartViewController: UIViewController {
       imageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0),
     ])
 
-    let button = UIButton(type: .system)
-    button.setTitle("Почати відеодзвінок", for: .normal)
-    button.setTitleColor(UIColor.brandColor, for: .normal)
-    button.addTarget(self, action: #selector(didTapStartButton), for: .touchUpInside)
-    button.sizeToFit()
-    button.translatesAutoresizingMaskIntoConstraints = false
-    view.addSubview(button)
+    view.addSubview(actionButton)
 
     NSLayoutConstraint.activate([
-      button.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-      button.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 30),
+      actionButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+      actionButton.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 30),
     ])
 
     spinner.translatesAutoresizingMaskIntoConstraints = false
@@ -55,6 +70,15 @@ public class StartViewController: UIViewController {
       spinner.centerXAnchor.constraint(equalTo: view.centerXAnchor),
       spinner.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 0),
     ])
+
+    view.addSubview(waitingForAgentLabel)
+
+    NSLayoutConstraint.activate([
+      waitingForAgentLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+      waitingForAgentLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 30),
+    ])
+
+    waitingForAgentLabel.isHidden = true
   }
 
   // MARK: - Actions
@@ -70,11 +94,54 @@ public class StartViewController: UIViewController {
           EndpointRouter.token = auth.token
           EndpointRouter.id = auth.verificationID
 
-          self.push()
-        case .failure(_):
+          self.startMonitoringStatus()
+        case .failure:
           self.showErrorAlert()
         }
       }
+    }
+  }
+}
+
+// MARK: - Private
+private extension StartViewController {
+  func startMonitoringStatus() {
+    showHideWaitingForConnection(show: true)
+    conferenceStatusRequester.start { [weak self] response in
+      guard let self = self else { return }
+      
+      switch response.result {
+      case let .success(verification):
+        switch verification.status {
+        case .WAIT_INVITE:
+          break
+        case .CONFERENCE_START,
+             .SELFIE_START,
+             .PASSPORT_PHOTO_START,
+             .SELFIE_WITH_PASSPORT_PHOTO_START,
+             .CONFERENCE_STOPPED:
+          self.showHideWaitingForConnection(show: false)
+          self.conferenceStatusRequester.stop()
+          self.push()
+        }
+      case .failure(_):
+        self.showHideWaitingForConnection(show: false)
+        self.conferenceStatusRequester.stop()
+        self.showErrorAlert()
+      }
+    }
+  }
+
+  func showHideWaitingForConnection(show: Bool) {
+    switch show {
+    case true:
+      spinner.startAnimating()
+      actionButton.isHidden = true
+      waitingForAgentLabel.isHidden = false
+    case false:
+      spinner.stopAnimating()
+      actionButton.isHidden = false
+      waitingForAgentLabel.isHidden = true
     }
   }
 }
