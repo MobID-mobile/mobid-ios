@@ -13,6 +13,7 @@
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
 		607FACEC1AFB9204008FA782 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* Tests.swift */; };
+		84FF4F51259B807800DCDCEA /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84FF4F50259B807800DCDCEA /* GoogleService-Info.plist */; };
 		E8BC2E070BE2D9E0916ED9AB /* Pods_MobID_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C9AC7BEF9AC7C19DC284C1C9 /* Pods_MobID_Example.framework */; };
 		F888D18ECE1A9CC3ACBC351C /* Pods_MobID_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 70D1B540E270AD9EA4CBA9F5 /* Pods_MobID_Tests.framework */; };
 /* End PBXBuildFile section */
@@ -44,6 +45,7 @@
 		70D1B540E270AD9EA4CBA9F5 /* Pods_MobID_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MobID_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7C4B2164E5EA98D42D76F64E /* Pods-MobID_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MobID_Example.release.xcconfig"; path = "Target Support Files/Pods-MobID_Example/Pods-MobID_Example.release.xcconfig"; sourceTree = "<group>"; };
 		8331272D43F7A35900D4C54B /* Pods-MobID_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MobID_Tests.release.xcconfig"; path = "Target Support Files/Pods-MobID_Tests/Pods-MobID_Tests.release.xcconfig"; sourceTree = "<group>"; };
+		84FF4F50259B807800DCDCEA /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "GoogleService-Info.plist"; sourceTree = SOURCE_ROOT; };
 		C9AC7BEF9AC7C19DC284C1C9 /* Pods_MobID_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MobID_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CFE6C649BCAC9A7F48FC9504 /* Pods-MobID_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MobID_Example.debug.xcconfig"; path = "Target Support Files/Pods-MobID_Example/Pods-MobID_Example.debug.xcconfig"; sourceTree = "<group>"; };
 		FC6A9E8858B3B7F42470F7DE /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
@@ -102,6 +104,7 @@
 		607FACD21AFB9204008FA782 /* Example for MobID */ = {
 			isa = PBXGroup;
 			children = (
+				84FF4F50259B807800DCDCEA /* GoogleService-Info.plist */,
 				607FACD51AFB9204008FA782 /* AppDelegate.swift */,
 				607FACD71AFB9204008FA782 /* ViewController.swift */,
 				607FACD91AFB9204008FA782 /* Main.storyboard */,
@@ -248,6 +251,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */,
+				84FF4F51259B807800DCDCEA /* GoogleService-Info.plist in Resources */,
 				607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */,
 				607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */,
 			);

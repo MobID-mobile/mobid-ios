@@ -6,15 +6,6 @@ import ALCameraViewController
 
 class VerificationViewController: UIViewController {
 
-  // MARK: - Nested
-  //  enum Status {
-  //    case waiting
-  //    case started(room: String)
-  //    case selfie
-  //    case passport
-  //    case selfieAndPassport
-  //  }
-
   // MARK: - Private
   private let networkClient = Client()
   private var conferenceCompletionPollingTimer: Timer?
@@ -86,10 +77,6 @@ class VerificationViewController: UIViewController {
       progressLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
       progressLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 30),
     ])
-
-    // "Зробити селфі"
-    // "Зробити фото паспорту"
-    // "Зробити селфі з паспортом"
   }
   
   // MARK: - Actions
