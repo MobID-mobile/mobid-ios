@@ -1,7 +1,7 @@
 //  Created by admin on 04.12.2020.
 
 import UIKit
-import JitsiMeet
+import JitsiMeetSDK
 
 class JitsiViewController: UIViewController, JitsiMeetViewDelegate {
 
