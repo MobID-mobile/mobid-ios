@@ -12,6 +12,7 @@ class Client {
   private enum C {
     static let host = "api.mobid.ai"
   }
+
   required init(urlSessionManager: URLSessionManager = URLSessionManager(configuration: URLSessionConfiguration.default),
                 queue: DispatchQueue = DispatchQueue(label: "mobID.NetworkClient. " + UUID().uuidString),
                 host: String = C.host) {

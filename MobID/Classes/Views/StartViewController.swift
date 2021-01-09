@@ -124,7 +124,7 @@ private extension StartViewController {
           self.conferenceStatusRequester.stop()
           self.push()
         }
-      case .failure(_):
+      case let .failure(error):
         self.showHideWaitingForConnection(show: false)
         self.conferenceStatusRequester.stop()
         self.showErrorAlert()

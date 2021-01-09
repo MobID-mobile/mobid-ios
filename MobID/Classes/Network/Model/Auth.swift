@@ -11,7 +11,7 @@ struct Auth: Codable {
   let images: [String]
   let conference: String?
   let token: String
-
+  
   enum CodingKeys: String, CodingKey {
     case verificationID = "verification_id"
     case status
