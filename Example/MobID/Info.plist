@@ -19,9 +19,15 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Please give access to your camera so we can see you.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Please give access to your mic so we can hear from you.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Please give access to your photo library to be able to choose a photo.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
@@ -35,11 +41,5 @@
 		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 	</array>
-	<key>NSCameraUsageDescription</key>
-	<string>Please give access to your camera so we can see you.</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Please give access to your photo library to be able to choose a photo.</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>Please give access to your mic so we can hear from you.</string>
 </dict>
 </plist>

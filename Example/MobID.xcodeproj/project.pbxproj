@@ -491,11 +491,12 @@
 			baseConfigurationReference = CFE6C649BCAC9A7F48FC9504 /* Pods-MobID_Example.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 6K3XX5R74V;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = MobID/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				MODULE_NAME = ExampleApp;
 				PRODUCT_BUNDLE_IDENTIFIER = com.Self.mobid.example;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -509,11 +510,12 @@
 			baseConfigurationReference = 7C4B2164E5EA98D42D76F64E /* Pods-MobID_Example.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 6K3XX5R74V;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = MobID/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				MODULE_NAME = ExampleApp;
 				PRODUCT_BUNDLE_IDENTIFIER = com.Self.mobid.example;
 				PRODUCT_NAME = "$(TARGET_NAME)";
