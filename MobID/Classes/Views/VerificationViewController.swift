@@ -9,7 +9,8 @@ class VerificationViewController: UIViewController {
   private let networkClient = Client()
   private let conferenceStatusRequester = ConferenceStatusRequester()
   private var status: VerificationStatus = .WAIT_INVITE
-  private var room: String?
+  private var jitsiRoom: String?
+  private var jitsiHost: String?
 
   private lazy var actionButton: UIButton = {
     let button = UIButton(type: .system)
@@ -29,6 +30,7 @@ class VerificationViewController: UIViewController {
     let label = UILabel()
     label.text = "Відправляємо фото..."
     label.sizeToFit()
+    label.backgroundColor = .white
     label.textColor = UIColor.brandColor
     label.translatesAutoresizingMaskIntoConstraints = false
     label.isHidden = true
@@ -107,7 +109,11 @@ class VerificationViewController: UIViewController {
 private extension VerificationViewController {
 
   func startJitsi() {
-    jitsiMeetViewController.join(room: room)
+    do {
+      try jitsiMeetViewController.join(hostName: jitsiHost, room: jitsiRoom)
+    } catch {
+      showErrorAlert()
+    }
   }
 
   func processCameraOutput(image: UIImage?, photoType: PhotoType) {
@@ -160,7 +166,8 @@ private extension VerificationViewController {
     case .WAIT_INVITE:
       break
     case .CONFERENCE_START:
-      room = model.conference?.jitsiRoom
+      jitsiRoom = model.conference?.jitsiRoom
+      jitsiHost = model.conference?.jitsiHost
       startJitsi()
     case .SELFIE_START:
       break

@@ -6,8 +6,8 @@ import JitsiMeetSDK
 class JitsiViewController: UIViewController, JitsiMeetViewDelegate {
 
   // MARK: - Nested
-  private enum C {
-    static let host: URL = URL(string: "https://jitsi.mobid.ai/")!
+  enum JitsiViewControllerError: Error {
+    case unableToBuildHostURL
   }
 
   // MARK: - Private
@@ -29,12 +29,19 @@ class JitsiViewController: UIViewController, JitsiMeetViewDelegate {
     }
   }
 
-  func join(room: String?) {
+  func join(hostName: String?, room: String?) throws {
+    guard let hostName = hostName, let room = room else {
+      throw JitsiViewControllerError.unableToBuildHostURL
+    }
+
+    let host = "https://" + hostName
+    guard let serverURL: URL = URL(string: host) else {
+      throw JitsiViewControllerError.unableToBuildHostURL
+    }
+
     let jitsiMeetConferenceOptions = JitsiMeetConferenceOptions.fromBuilder { (builder) in
-      builder.serverURL = C.host
+      builder.serverURL = serverURL
       builder.audioOnly = false
-//      builder.audioMuted = true
-//      builder.videoMuted = true
       builder.room = room
     }
 
