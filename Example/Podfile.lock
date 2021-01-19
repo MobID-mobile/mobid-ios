@@ -1,6 +1,6 @@
 PODS:
   - ALCameraViewController (3.1)
-  - MobID (0.1.3):
+  - MobID (0.1.4):
     - ALCameraViewController (= 3.1)
 
 DEPENDENCIES:
@@ -16,7 +16,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   ALCameraViewController: 144dea45fd749a623aafd8cb7b10cea88499fcc3
-  MobID: 708deba441a46403298d8691198ba75ba5994a6c
+  MobID: 30ad8b51981d7670ea02e878479d62a60d45fc08
 
 PODFILE CHECKSUM: 7b5e3f37378dfa41988503d16403cbb34719faad
 
