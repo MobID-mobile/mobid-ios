@@ -47,6 +47,7 @@ class Client {
     }
   }
 
+  @discardableResult
   func performURLRequest<T: Decodable>(_ request: URLRequest,
                                        completion: @escaping (Response<T>) -> Void) -> URLSessionDataTask? {
     return urlSessionManager.perform(request: request) { [weak self] response in
@@ -128,15 +129,21 @@ extension Client {
         "verification": EndpointRouter.id
       ]
     )
-    let url = try! photoEndpoint.asURLRequest().url!
-    let multipartRequest = try! MultipartRequest.make(
-      url: url,
-      image: image,
-      type: type.rawValue,
-      verification: EndpointRouter.id,
-      token: EndpointRouter.token
-    )
+    
+    do {
+      let url = try photoEndpoint.asURLRequest().url!
+      let multipartRequest = try MultipartRequest.make(
+        url: url,
+        image: image,
+        type: type.rawValue,
+        verification: EndpointRouter.id,
+        token: EndpointRouter.token
+      )
 
-    return performURLRequest(multipartRequest.0, completion: completion)
+      return performURLRequest(multipartRequest.0, completion: completion)
+    } catch {
+      completion(.init(result: .failure(.endpointError(error: error)), request: nil))
+      return nil
+    }
   }
 }
