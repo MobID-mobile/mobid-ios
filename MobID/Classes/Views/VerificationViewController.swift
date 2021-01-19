@@ -46,6 +46,11 @@ class VerificationViewController: UIViewController {
 
     setupVerificationUpdateTimer()
   }
+
+  override func viewDidDisappear(_ animated: Bool) {
+    super.viewDidDisappear(animated)
+    stopVerification()
+  }
   
   // MARK: - Subviews management
   private func addJitsiMeetView() {
@@ -176,21 +181,25 @@ private extension VerificationViewController {
     case .SELFIE_WITH_PASSPORT_PHOTO_START:
       break
     case .CONFERENCE_STOPPED:
-      stopConference(model: model)
+      finishVerification(model: model)
     }
 
     changeActionButtonState()
   }
 
-  func stopConference(model: Verification) {
+  func stopVerification() {
+    conferenceStatusRequester.stop()
+    jitsiMeetViewController.leave(completion: nil)
+  }
+
+  func finishVerification(model: Verification) {
+    stopVerification()
 
     let dValue = model.score?.document
     let fValue = model.score?.facialMatch
     let lValue = model.score?.liveness
 
-    conferenceStatusRequester.stop()
-    self.jitsiMeetViewController.leave(completion: nil)
-    self.navigationController?.pushViewController(
+    navigationController?.pushViewController(
       EndViewController(
         dValue: dValue.flatMap { Float($0) },
         fValue: fValue.flatMap { Float($0) },
