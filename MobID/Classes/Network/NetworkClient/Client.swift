@@ -3,8 +3,8 @@
 import Foundation
 
 struct Response<T: Decodable> {
-  public let result: Result<T, ClientError>
-  public let request: URLRequest?
+  let result: Result<T, ClientError>
+  let request: URLRequest?
 }
 
 class Client {
