@@ -50,10 +50,8 @@ public class StartViewController: UIViewController {
     view.addSubview(imageView)
 
     NSLayoutConstraint.activate([
-      imageView.heightAnchor.constraint(equalTo: imageView.widthAnchor),
-      imageView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.5),
       imageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-      imageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0),
+      imageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 54),
     ])
 
     view.addSubview(actionButton)
