@@ -5,8 +5,9 @@ import Foundation
 enum VerificationStatus: String, Codable {
   case WAIT_INVITE
   case CONFERENCE_START
-  case SELFIE_START
-  case PASSPORT_PHOTO_START
-  case SELFIE_WITH_PASSPORT_PHOTO_START
-  case CONFERENCE_STOPPED
+  case SELFIE_1_START
+  case SELFIE_2_START
+  case DOCUMENTS_START
+  case SELFIE_WITH_DOCUMENTS_START
+  case CONFERENCE_STOP
 }

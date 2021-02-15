@@ -91,13 +91,16 @@ class VerificationViewController: UIViewController {
       var type: PhotoType?
 
       switch self.status {
-      case .SELFIE_START:
+      case .SELFIE_1_START,
+           .SELFIE_2_START:
         type = .SELFIE
-      case .PASSPORT_PHOTO_START:
+      case .DOCUMENTS_START:
         type = .PASSPORT
-      case .SELFIE_WITH_PASSPORT_PHOTO_START:
+      case .SELFIE_WITH_DOCUMENTS_START:
         type = .SELFIE_WITH_PASSPORT
-      default:
+      case .WAIT_INVITE,
+           .CONFERENCE_STOP,
+           .CONFERENCE_START:
         break
       }
 
@@ -168,20 +171,18 @@ private extension VerificationViewController {
 
   func process(model: Verification) {
     switch status {
-    case .WAIT_INVITE:
-      break
     case .CONFERENCE_START:
       jitsiRoom = model.conference?.jitsiRoom
       jitsiHost = model.conference?.jitsiHost
       startJitsi()
-    case .SELFIE_START:
-      break
-    case .PASSPORT_PHOTO_START:
-      break
-    case .SELFIE_WITH_PASSPORT_PHOTO_START:
-      break
-    case .CONFERENCE_STOPPED:
+    case .CONFERENCE_STOP:
       finishVerification(model: model)
+    case .WAIT_INVITE,
+         .SELFIE_1_START,
+         .SELFIE_2_START,
+         .DOCUMENTS_START,
+         .SELFIE_WITH_DOCUMENTS_START:
+      break
     }
 
     changeActionButtonState()
@@ -211,16 +212,19 @@ private extension VerificationViewController {
   func changeActionButtonState() {
 
     switch status {
-    case .WAIT_INVITE, .CONFERENCE_START, .CONFERENCE_STOPPED:
+    case .WAIT_INVITE, .CONFERENCE_START, .CONFERENCE_STOP:
       actionButton.isHidden = true
       actionButton.setTitle("", for: .normal)
-    case .SELFIE_START:
+    case .SELFIE_1_START:
       actionButton.setTitle("Зробити селфі", for: .normal)
       actionButton.isHidden = false
-    case .PASSPORT_PHOTO_START:
+    case .SELFIE_2_START:
+      actionButton.setTitle("Зробити друге селфі", for: .normal)
+      actionButton.isHidden = false
+    case .DOCUMENTS_START:
       actionButton.setTitle("Зробити фото паспорту", for: .normal)
       actionButton.isHidden = false
-    case .SELFIE_WITH_PASSPORT_PHOTO_START:
+    case .SELFIE_WITH_DOCUMENTS_START:
       actionButton.setTitle("Зробити селфі з паспортом", for: .normal)
       actionButton.isHidden = false
     }

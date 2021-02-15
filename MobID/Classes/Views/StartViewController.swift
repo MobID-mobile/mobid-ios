@@ -109,20 +109,13 @@ private extension StartViewController {
       guard let self = self else { return }
       
       switch response.result {
-      case let .success(verification):
-        switch verification.status {
-        case .WAIT_INVITE:
-          break
-        case .CONFERENCE_START,
-             .SELFIE_START,
-             .PASSPORT_PHOTO_START,
-             .SELFIE_WITH_PASSPORT_PHOTO_START,
-             .CONFERENCE_STOPPED:
-          self.showHideWaitingForConnection(show: false)
-          self.conferenceStatusRequester.stop()
-          self.push()
-        }
-      case let .failure(error):
+      case let .success(verification) where verification.status == .WAIT_INVITE:
+        break
+      case .success:
+        self.showHideWaitingForConnection(show: false)
+        self.conferenceStatusRequester.stop()
+        self.push()
+      case .failure:
         self.showHideWaitingForConnection(show: false)
         self.conferenceStatusRequester.stop()
         self.showErrorAlert()
