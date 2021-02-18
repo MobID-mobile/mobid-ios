@@ -11,38 +11,13 @@ class VerificationViewController: UIViewController {
   private var status: VerificationStatus = .WAIT_INVITE
   private var jitsiRoom: String?
   private var jitsiHost: String?
-
-  private lazy var actionButton: UIButton = {
-    let button = UIButton(type: .system)
-    button.setTitleColor(UIColor.brandColor, for: .normal)
-    button.backgroundColor = .white
-    button.setTitle("", for: .normal)
-    button.addTarget(self, action: #selector(didTapButton), for: .touchUpInside)
-
-    button.sizeToFit()
-    button.translatesAutoresizingMaskIntoConstraints = false
-    return button
-
-  }()
-
   private lazy var jitsiMeetViewController = JitsiViewController()
-  private lazy var progressLabel: UILabel = {
-    let label = UILabel()
-    label.text = "Відправляємо фото..."
-    label.sizeToFit()
-    label.backgroundColor = .white
-    label.textColor = UIColor.brandColor
-    label.translatesAutoresizingMaskIntoConstraints = false
-    label.isHidden = true
-    return label
-  }()
 
   // MARK: - Override
   override func viewDidLoad() {
     super.viewDidLoad()
     view.backgroundColor = .white
     addJitsiMeetView()
-    addSubviews()
 
     setupVerificationUpdateTimer()
   }
@@ -64,53 +39,6 @@ class VerificationViewController: UIViewController {
       jitsiMeetViewController.view.bottomAnchor.constraint(equalTo: self.view.bottomAnchor),
     ])
   }
-  
-  private func addSubviews() {
-    view.addSubview(actionButton)
-    actionButton.isHidden = true
-    
-    NSLayoutConstraint.activate([
-      actionButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 48),
-      actionButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 24),
-      actionButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor , constant: -24)
-    ])
-
-    view.addSubview(progressLabel)
-
-    NSLayoutConstraint.activate([
-      progressLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-      progressLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 30),
-    ])
-  }
-  
-  // MARK: - Actions
-  @objc private func didTapButton() {
-    jitsiMeetViewController.leave { [weak self] in
-      guard let self = self else { return }
-
-      var type: PhotoType?
-
-      switch self.status {
-      case .SELFIE_1_START,
-           .SELFIE_2_START:
-        type = .SELFIE
-      case .DOCUMENTS_START:
-        type = .PASSPORT
-      case .SELFIE_WITH_DOCUMENTS_START:
-        type = .SELFIE_WITH_PASSPORT
-      case .WAIT_INVITE,
-           .CONFERENCE_STOP,
-           .CONFERENCE_START:
-        break
-      }
-
-      guard let photoType = type else {
-        return
-      }
-
-      self.presentALCameraView(for: photoType)
-    }
-  }
 }
 
 // MARK: - Logic
@@ -121,33 +49,6 @@ private extension VerificationViewController {
       try jitsiMeetViewController.join(hostName: jitsiHost, room: jitsiRoom)
     } catch {
       showErrorAlert()
-    }
-  }
-
-  func processCameraOutput(image: UIImage?, photoType: PhotoType) {
-    
-    guard let image = image else {
-      self.showErrorAlert()
-      startJitsi()
-      return
-    }
-
-    progressLabel.isHidden = false
-    view.bringSubviewToFront(progressLabel)
-
-    networkClient.photo(image: image, type: photoType) { [weak self] response in
-      DispatchQueue.main.async {
-        guard let self = self else { return }
-        switch response.result {
-        case let .success(photo):
-          print(photo)
-        case let .failure(error):
-          print(error.localizedDescription)
-          self.showErrorAlert()
-        }
-        self.progressLabel.isHidden = true
-        self.startJitsi()
-      }
     }
   }
 
@@ -184,8 +85,6 @@ private extension VerificationViewController {
          .SELFIE_WITH_DOCUMENTS_START:
       break
     }
-
-    changeActionButtonState()
   }
 
   func stopVerification() {
@@ -207,59 +106,5 @@ private extension VerificationViewController {
         lValue: lValue.flatMap { Float($0) }
       ),
       animated: true)
-  }
-
-  func changeActionButtonState() {
-
-    switch status {
-    case .WAIT_INVITE, .CONFERENCE_START, .CONFERENCE_STOP:
-      actionButton.isHidden = true
-      actionButton.setTitle("", for: .normal)
-    case .SELFIE_1_START:
-      actionButton.setTitle("Зробити селфі", for: .normal)
-      actionButton.isHidden = false
-    case .SELFIE_2_START:
-      actionButton.setTitle("Зробити друге селфі", for: .normal)
-      actionButton.isHidden = false
-    case .DOCUMENTS_START:
-      actionButton.setTitle("Зробити фото паспорту", for: .normal)
-      actionButton.isHidden = false
-    case .SELFIE_WITH_DOCUMENTS_START:
-      actionButton.setTitle("Зробити селфі з паспортом", for: .normal)
-      actionButton.isHidden = false
-    }
-  }
-}
-
-// MARK: - Navigation
-private extension VerificationViewController {
-  func presentALCameraView(for photoType: PhotoType) {
-    DispatchQueue.main.async {
-
-      let cameraCroppingParameters = CroppingParameters(
-        isEnabled: false,
-        allowResizing: false,
-        allowMoving: false,
-        minimumSize: CGSize(width: 100, height: 100)
-      )
-
-      let cameraViewCompletion: CameraViewCompletion = { [weak self] image, asset in
-        guard let self = self else { return }
-        self.dismiss(animated: true) {
-          self.processCameraOutput(image: image, photoType: photoType)
-        }
-      }
-      let cameraViewController: UIViewController
-      #if targetEnvironment(simulator)
-      cameraViewController = CameraViewController.imagePickerViewController(croppingParameters: cameraCroppingParameters, completion: cameraViewCompletion)
-      #else
-      cameraViewController = CameraViewController(croppingParameters: cameraCroppingParameters, completion: cameraViewCompletion)
-      #endif
-
-      if #available(iOS 13.0, *) {
-        cameraViewController.isModalInPresentation = true
-      }
-      self.present(cameraViewController, animated: true, completion: nil)
-    }
   }
 }
