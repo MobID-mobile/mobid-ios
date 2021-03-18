@@ -4,6 +4,7 @@ import Foundation
 
 enum EndpointRouter: HTTPEndpoint {
 
+  static var scheme: String?
   static var host: String?
   static var token: String = ""
   static var id: String = ""
@@ -15,7 +16,11 @@ enum EndpointRouter: HTTPEndpoint {
 
 extension EndpointRouter {
   var scheme: String {
-    return "https"
+    guard let scheme = Self.scheme else {
+      assertionFailure("Scheme should exist")
+      return ""
+    }
+    return scheme
   }
 
   var host: String {
