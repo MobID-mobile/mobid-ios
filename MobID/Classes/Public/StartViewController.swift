@@ -12,8 +12,7 @@ public class StartViewController: UIViewController {
   }
 
   // MARK: - Private
-  private let networkClient = Client()
-  private let conferenceStatusRequester = ConferenceStatusRequester()
+  private let networkService = NetworkService()
 
   private lazy var spinner: UIActivityIndicatorView = {
     let view = UIActivityIndicatorView(style: .gray)
@@ -82,16 +81,12 @@ public class StartViewController: UIViewController {
   // MARK: - Actions
   @objc private func didTapStartButton() {
     spinner.startAnimating()
-    networkClient.auth { [weak self] response in
+    networkService.auth { [weak self] response in
       DispatchQueue.main.async {
         guard let self = self else { return }
         self.spinner.stopAnimating()
         switch response.result {
-        case let .success(auth):
-
-          EndpointRouter.token = auth.token
-          EndpointRouter.id = auth.verificationID
-
+        case .success:
           self.startMonitoringStatus()
         case .failure:
           self.showErrorAlert()
@@ -105,20 +100,22 @@ public class StartViewController: UIViewController {
 private extension StartViewController {
   func startMonitoringStatus() {
     showHideWaitingForConnection(show: true)
-    conferenceStatusRequester.start { [weak self] response in
-      guard let self = self else { return }
-      
-      switch response.result {
-      case let .success(verification) where verification.status == .WAIT_INVITE:
-        break
-      case .success:
-        self.showHideWaitingForConnection(show: false)
-        self.conferenceStatusRequester.stop()
-        self.push()
-      case .failure:
-        self.showHideWaitingForConnection(show: false)
-        self.conferenceStatusRequester.stop()
-        self.showErrorAlert()
+    networkService.startVerificationStatusMonitoring { [weak self] response in
+      DispatchQueue.main.async {
+        guard let self = self else { return }
+
+        switch response.result {
+        case let .success(verification) where verification.status == .WAIT_INVITE:
+          break
+        case .success:
+          self.showHideWaitingForConnection(show: false)
+          self.networkService.stopVerificationStatusMonitoring()
+          self.push()
+        case .failure:
+          self.showHideWaitingForConnection(show: false)
+          self.networkService.stopVerificationStatusMonitoring()
+          self.showErrorAlert()
+        }
       }
     }
   }

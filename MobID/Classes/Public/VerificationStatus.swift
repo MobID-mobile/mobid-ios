@@ -2,7 +2,7 @@
 
 import Foundation
 
-enum VerificationStatus: String, Codable {
+public enum VerificationStatus: String, Codable {
   case WAIT_INVITE
   case CONFERENCE_START
   case SELFIE_1_START

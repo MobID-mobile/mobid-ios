@@ -2,7 +2,7 @@
 
 import Foundation
 
-enum URLSessionError: LocalizedError {
+public enum URLSessionError: LocalizedError {
   
   case unknown
   case timeOut
@@ -29,7 +29,7 @@ enum URLSessionError: LocalizedError {
     }
   }
   
-  var errorDescription: String? {
+  public var errorDescription: String? {
     switch self {
     case .unknown:
       return "Unknown"

@@ -5,8 +5,7 @@ import UIKit
 class VerificationViewController: UIViewController {
 
   // MARK: - Private
-  private let networkClient = Client()
-  private let conferenceStatusRequester = ConferenceStatusRequester()
+  private let networkService = NetworkService()
   private var status: VerificationStatus = .WAIT_INVITE
   private var jitsiRoom: String?
   private var jitsiHost: String?
@@ -52,19 +51,20 @@ private extension VerificationViewController {
   }
 
   func setupVerificationUpdateTimer() {
-    conferenceStatusRequester.start { [weak self] response in
-      guard let self = self else { return }
+    networkService.startVerificationStatusMonitoring { [weak self] response in
+      DispatchQueue.main.async {
+        guard let self = self else { return }
 
-      switch response.result {
-      case let .success(verification):
-        guard self.status != verification.status else {
-          return
+        switch response.result {
+        case let .success(verification):
+          guard self.status != verification.status else {
+            return
+          }
+          self.status = verification.status
+          self.process(model: verification)
+        case .failure:
+          break
         }
-        self.status = verification.status
-        self.process(model: verification)
-      case let .failure(error):
-        print(error)
-        break
       }
     }
   }
@@ -87,7 +87,7 @@ private extension VerificationViewController {
   }
 
   func stopVerification() {
-    conferenceStatusRequester.stop()
+    networkService.stopVerificationStatusMonitoring()
     jitsiMeetViewController.leave(completion: nil)
   }
 

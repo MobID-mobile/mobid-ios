@@ -2,14 +2,14 @@
 
 import Foundation
 
-enum ClientError: LocalizedError {
+public enum ClientError: LocalizedError {
   case endpointError(error: Error)
   case networkError(error: URLSessionError)
   case serverError(statusCode: Int)
   case parsingError(error: Error)
   case dataIsEmptyError
 
-  var errorDescription: String? {
+  public var errorDescription: String? {
     switch self {
     case .endpointError(let endpointError):
       return "Endpoint error: \(endpointError.localizedDescription)"
@@ -22,12 +22,5 @@ enum ClientError: LocalizedError {
     case .dataIsEmptyError:
       return "Response data is empty"
     }
-  }
-
-  var isSilent: Bool {
-    if case .networkError(let networkError) = self, case .cancelled = networkError {
-      return true
-    }
-    return false
   }
 }
