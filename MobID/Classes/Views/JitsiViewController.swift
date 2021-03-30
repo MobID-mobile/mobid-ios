@@ -5,39 +5,20 @@ import JitsiMeetSDK
 
 class JitsiViewController: UIViewController, JitsiMeetViewDelegate {
 
-  // MARK: - Nested
-  enum JitsiViewControllerError: Error {
-    case unableToBuildHostURL
-  }
-
   // MARK: - Private
   private var jitsiView: JitsiMeetView {
     return view as! JitsiMeetView
   }
 
-  private var leaveCompletion: (() -> Void)?
-  private var connected: Bool = false
-
   // MARK: - Interface
-  func leave(completion: (() -> Void)?) {
-    leaveCompletion = completion
-    if connected == false {
-      leaveCompletion?()
-      leaveCompletion = nil
-    } else {
-      jitsiView.leave()
-    }
+  private(set) var connected: Bool = false
+  var leaveCompletion: (() -> Void)?
+
+  func leave() {
+    jitsiView.leave()
   }
 
-  func join(hostName: String?, room: String?) throws {
-    guard let hostName = hostName, let room = room else {
-      throw JitsiViewControllerError.unableToBuildHostURL
-    }
-
-    let host = "https://" + hostName
-    guard let serverURL: URL = URL(string: host) else {
-      throw JitsiViewControllerError.unableToBuildHostURL
-    }
+  func join(serverURL: URL, room: String) {
 
     let jitsiMeetConferenceOptions = JitsiMeetConferenceOptions.fromBuilder { (builder) in
       builder.serverURL = serverURL

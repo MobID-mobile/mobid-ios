@@ -13,13 +13,18 @@ class NetworkService {
     stopVerificationStatusMonitoring()
   }
 
+  func stopConference(completion: @escaping (Response<ConferenceUpdate>) -> Void) -> URLSessionDataTask? {
+    networkClient.stopConference() { result in
+      print(result)
+    }
+  }
+
   func auth(callback: @escaping (Response<Auth>) -> Void) {
     networkClient.auth {
       switch $0.result {
       case let .success(auth):
-
         EndpointRouter.token = auth.token
-        EndpointRouter.id = auth.verificationID
+        EndpointRouter.verificationID = auth.verificationID
 
       case let .failure(error):
         MobID.delegate?.errorOccurred(error)
@@ -37,6 +42,8 @@ class NetworkService {
         self?.networkClient.verification {
           switch $0.result {
           case let .success(verification):
+            EndpointRouter.conferenceID = verification.conference?.conferenceID ?? ""
+
             MobID.delegate?.verificationStatus(verification.status)
           case let .failure(error):
             MobID.delegate?.errorOccurred(error)

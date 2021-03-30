@@ -7,8 +7,6 @@ class VerificationViewController: UIViewController {
   // MARK: - Private
   private let networkService = NetworkService()
   private var status: VerificationStatus = .WAIT_INVITE
-  private var jitsiRoom: String?
-  private var jitsiHost: String?
   private lazy var jitsiMeetViewController = JitsiViewController()
 
   // MARK: - Override
@@ -36,18 +34,28 @@ class VerificationViewController: UIViewController {
       jitsiMeetViewController.view.rightAnchor.constraint(equalTo: self.view.rightAnchor),
       jitsiMeetViewController.view.bottomAnchor.constraint(equalTo: self.view.bottomAnchor),
     ])
+
+    jitsiMeetViewController.leaveCompletion = { [weak self] in
+      self?.networkService.stopConference(completion: { [weak self] update in
+        self?.networkService.stopVerificationStatusMonitoring()
+      })
+    }
   }
 }
 
 // MARK: - Logic
 private extension VerificationViewController {
 
-  func startJitsi() {
-    do {
-      try jitsiMeetViewController.join(hostName: jitsiHost, room: jitsiRoom)
-    } catch {
-      showErrorAlert()
+  func startJitsi(hostName: String?, room: String?) {
+    guard let hostName = hostName, let room = room else {
+      return
     }
+    let host = "https://" + hostName
+    guard let serverURL = URL(string: host) else {
+      return
+    }
+
+    jitsiMeetViewController.join(serverURL: serverURL, room: room)
   }
 
   func setupVerificationUpdateTimer() {
@@ -72,9 +80,7 @@ private extension VerificationViewController {
   func process(model: Verification) {
     switch status {
     case .CONFERENCE_START:
-      jitsiRoom = model.conference?.jitsiRoom
-      jitsiHost = model.conference?.jitsiHost
-      startJitsi()
+      startJitsi(hostName: model.conference?.jitsiHost, room: model.conference?.jitsiRoom)
     case .CONFERENCE_STOP:
       finishVerification(model: model)
     case .WAIT_INVITE,
@@ -87,8 +93,7 @@ private extension VerificationViewController {
   }
 
   func stopVerification() {
-    networkService.stopVerificationStatusMonitoring()
-    jitsiMeetViewController.leave(completion: nil)
+    jitsiMeetViewController.leave()
   }
 
   func finishVerification(model: Verification) {

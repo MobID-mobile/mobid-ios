@@ -112,6 +112,20 @@ extension Client {
   }
 
   @discardableResult
+  func stopConference(completion: @escaping (Response<ConferenceUpdate>) -> Void) -> URLSessionDataTask? {
+
+    return perform(
+      EndpointRouter.stopConference(
+        parameters: [
+          "verification": EndpointRouter.verificationID,
+          "status": VerificationStatus.CONFERENCE_STOP.rawValue
+        ]
+      ),
+      completion: completion
+    )
+  }
+
+  @discardableResult
   func photo(image: UIImage,
              type: PhotoType,
              completion: @escaping (Response<Photo>) -> Void) -> URLSessionDataTask? {
@@ -119,7 +133,7 @@ extension Client {
     let photoEndpoint = EndpointRouter.photo(
       parameters: [
         "type": type.rawValue,
-        "verification": EndpointRouter.id
+        "verification": EndpointRouter.verificationID
       ]
     )
     
@@ -129,7 +143,7 @@ extension Client {
         url: url,
         image: image,
         type: type.rawValue,
-        verification: EndpointRouter.id,
+        verification: EndpointRouter.verificationID,
         token: EndpointRouter.token
       )
 
