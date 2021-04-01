@@ -8,12 +8,11 @@ enum EndpointRouter: HTTPEndpoint {
   static var host: String?
   static var token: String = ""
   static var verificationID: String = ""
-  static var conferenceID: String = ""
 
   case auth(parameters: HTTPParameters)
   case verification
   case photo(parameters: HTTPParameters)
-  case stopConference(parameters: HTTPParameters)
+  case patchVerification(parameters: HTTPParameters)
   case openConferences
 }
 
@@ -41,7 +40,7 @@ extension EndpointRouter {
 
   var queryItems: HTTPQueryItems? {
     switch self {
-    case .auth, .verification, .photo, .stopConference, .openConferences:
+    case .auth, .verification, .photo, .patchVerification, .openConferences:
       return nil
     }
   }
@@ -50,12 +49,11 @@ extension EndpointRouter {
     switch self {
     case .auth:
       return "/api/v1.1/verifications/"
-    case .verification:
+    case .verification,
+         .patchVerification:
       return "/api/v1.1/verifications/" + Self.verificationID + "/"
     case .photo:
       return "/api/v1.1/verifications/" + Self.verificationID + "/images/"
-    case .stopConference:
-      return "/api/v1.1/conferences/" + Self.conferenceID + "/"
     case .openConferences:
       return "/api/v1.1/open_conferences/"
     }
@@ -69,7 +67,7 @@ extension EndpointRouter {
     case .verification,
          .openConferences:
       return .get
-    case .stopConference:
+    case .patchVerification:
       return .patch
     }
   }
@@ -78,7 +76,7 @@ extension EndpointRouter {
     switch self {
     case let .auth(parameters),
          let .photo(parameters),
-         let .stopConference(parameters):
+         let .patchVerification(parameters):
       return parameters
     case .verification,
          .openConferences:
@@ -93,7 +91,7 @@ extension EndpointRouter {
       return [:]
     case .verification,
          .photo,
-         .stopConference:
+         .patchVerification:
       return ["authorization": "Bearer \(Self.token)"]
     }
   }

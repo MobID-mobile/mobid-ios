@@ -43,8 +43,6 @@ class NetworkService {
         self?.networkClient.verification {
           switch $0.result {
           case let .success(verification):
-            EndpointRouter.conferenceID = verification.conference?.conferenceID ?? ""
-
             MobID.delegate?.verificationStatus(verification.status)
           case let .failure(error):
             MobID.delegate?.errorOccurred(error)

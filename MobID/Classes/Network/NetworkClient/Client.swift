@@ -116,7 +116,7 @@ extension Client {
   func stopConference(completion: @escaping (Response<ConferenceUpdate>) -> Void) -> URLSessionDataTask? {
 
     return perform(
-      EndpointRouter.stopConference(
+      EndpointRouter.patchVerification(
         parameters: [
           "verification": EndpointRouter.verificationID,
           "status": VerificationStatus.CONFERENCE_STOP.rawValue
