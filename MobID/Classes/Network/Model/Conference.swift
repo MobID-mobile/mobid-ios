@@ -3,13 +3,14 @@
 import Foundation
 // MARK: - Conference
 struct Conference: Codable {
-  let conferenceID, jitsiHost, jitsiRoom: String
+  let conferenceID, status, jitsiHost, jitsiRoom: String
   let createdAt: String
   let verification: VerificationDetails
 
   enum CodingKeys: String, CodingKey {
     case conferenceID = "conference_id"
     case verification
+    case status
     case jitsiHost = "jitsi_host"
     case jitsiRoom = "jitsi_room"
     case createdAt = "created_at"

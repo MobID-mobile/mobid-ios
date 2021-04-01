@@ -14,6 +14,7 @@ enum EndpointRouter: HTTPEndpoint {
   case verification
   case photo(parameters: HTTPParameters)
   case stopConference(parameters: HTTPParameters)
+  case openConferences
 }
 
 extension EndpointRouter {
@@ -40,7 +41,7 @@ extension EndpointRouter {
 
   var queryItems: HTTPQueryItems? {
     switch self {
-    case .auth, .verification, .photo, .stopConference:
+    case .auth, .verification, .photo, .stopConference, .openConferences:
       return nil
     }
   }
@@ -55,6 +56,8 @@ extension EndpointRouter {
       return "/api/v1.1/verifications/" + Self.verificationID + "/images/"
     case .stopConference:
       return "/api/v1.1/conferences/" + Self.conferenceID + "/"
+    case .openConferences:
+      return "/api/v1.1/open_conferences/"
     }
   }
 
@@ -63,7 +66,8 @@ extension EndpointRouter {
     case .auth,
          .photo:
       return .post
-    case .verification:
+    case .verification,
+         .openConferences:
       return .get
     case .stopConference:
       return .patch
@@ -76,14 +80,16 @@ extension EndpointRouter {
          let .photo(parameters),
          let .stopConference(parameters):
       return parameters
-    case .verification:
+    case .verification,
+         .openConferences:
       return nil
     }
   }
 
   var headers: HTTPHeaders {
     switch self {
-    case .auth:
+    case .auth,
+         .openConferences:
       return [:]
     case .verification,
          .photo,

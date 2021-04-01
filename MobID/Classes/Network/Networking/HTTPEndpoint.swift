@@ -55,6 +55,7 @@ extension HTTPEndpoint {
     urlComponents.path = path
     urlComponents.queryItems = queryItems?.map { URLQueryItem(name: $0, value: $1) }
     guard let url = urlComponents.url else {
+      print(urlComponents.debugDescription)
       throw EndpointError.invalidURL(description: urlComponents.debugDescription)
     }
     return url

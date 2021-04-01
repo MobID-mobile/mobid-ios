@@ -19,10 +19,22 @@ public protocol MobIDDelegate {
 
 public class MobID {
 
+  // MARK: - Public
   public static var delegate: MobIDDelegate?
 
+
+  // MARK: - Private
+  private static let networkClient = Client()
+
+  // MARK: - Public
   public static func configure(host: MobIDHost) {
     EndpointRouter.host = host.name
     EndpointRouter.scheme = host.scheme
+  }
+
+  public static func getOpenConferences(completion: @escaping (Result<OpenConferences, ClientError>)-> Void) {
+    networkClient.openConferences {
+      completion($0.result)
+    }
   }
 }

@@ -9,7 +9,7 @@ struct Auth: Codable {
   let score: Score
   let documentData, createdAt, updatedAt: String
   let images: [String]
-  let conference: String?
+  let conference: Conference?
   let token: String
   
   enum CodingKeys: String, CodingKey {

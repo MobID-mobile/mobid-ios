@@ -90,11 +90,12 @@ class Client {
 extension Client {
 
   @discardableResult
-  func auth(completion: @escaping (Response<Auth>) -> Void) -> URLSessionDataTask? {
+  func auth(to conferenceID: String?, completion: @escaping (Response<Auth>) -> Void) -> URLSessionDataTask? {
 
     return perform(
       EndpointRouter.auth(
         parameters: [
+          "conference_id": conferenceID ?? "null",
           "status": VerificationStatus.WAIT_INVITE.rawValue
         ]
       ),
@@ -121,6 +122,15 @@ extension Client {
           "status": VerificationStatus.CONFERENCE_STOP.rawValue
         ]
       ),
+      completion: completion
+    )
+  }
+
+  @discardableResult
+  func openConferences(completion: @escaping (Response<OpenConferences>) -> Void) -> URLSessionDataTask? {
+
+    return perform(
+      EndpointRouter.openConferences,
       completion: completion
     )
   }

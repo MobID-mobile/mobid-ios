@@ -17,19 +17,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 
     MobID.configure(host: MobIDHost(scheme: "https", name: "api.mobid.ai"))
-    MobID.delegate = self
 
     return true
-  }
-}
-
-extension AppDelegate: MobIDDelegate {
-  func verificationStatus(_ status: VerificationStatus) {
-    print(status)
-  }
-
-  func errorOccurred(_ error: ClientError) {
-    print(error)
   }
 }
 

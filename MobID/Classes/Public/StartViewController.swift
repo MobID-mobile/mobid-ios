@@ -4,6 +4,9 @@ import UIKit
 
 public class StartViewController: UIViewController {
 
+  // MARK: - Public
+  public var conferenceID: String?
+
   // MARK: - Override
   public override func viewDidLoad() {
     super.viewDidLoad()
@@ -81,7 +84,7 @@ public class StartViewController: UIViewController {
   // MARK: - Actions
   @objc private func didTapStartButton() {
     spinner.startAnimating()
-    networkService.auth { [weak self] response in
+    networkService.auth(to: conferenceID) { [weak self] response in
       DispatchQueue.main.async {
         guard let self = self else { return }
         self.spinner.stopAnimating()

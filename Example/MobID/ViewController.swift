@@ -7,18 +7,37 @@
 //
 
 import UIKit
+import MobID
 
 class ViewController: UIViewController {
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
-    }
+  override func viewDidLoad() {
+    super.viewDidLoad()
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
+    MobID.delegate = self
 
+    MobID.getOpenConferences() { [weak self] result in
+      switch result {
+      case let .success(openConferences):
+        DispatchQueue.main.async {
+          let startViewController = StartViewController()
+          startViewController.conferenceID = openConferences.first?.conferenceID
+          self?.navigationController?.pushViewController(startViewController, animated: true)
+        }
+      case .failure(_):
+        break
+      }
+    }
+  }
 }
 
+
+extension ViewController: MobIDDelegate {
+  func verificationStatus(_ status: VerificationStatus) {
+    print(status)
+  }
+
+  func errorOccurred(_ error: ClientError) {
+    print(error)
+  }
+}

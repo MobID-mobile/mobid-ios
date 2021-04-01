@@ -13,14 +13,15 @@ class NetworkService {
     stopVerificationStatusMonitoring()
   }
 
-  func stopConference(completion: @escaping (Response<ConferenceUpdate>) -> Void) -> URLSessionDataTask? {
+  // MARK: - Interface
+  func stopConference(callback: @escaping (Response<ConferenceUpdate>) -> Void) -> URLSessionDataTask? {
     networkClient.stopConference() { result in
       print(result)
     }
   }
 
-  func auth(callback: @escaping (Response<Auth>) -> Void) {
-    networkClient.auth {
+  func auth(to conferenceID: String?, callback: @escaping (Response<Auth>) -> Void) {
+    networkClient.auth(to: conferenceID) {
       switch $0.result {
       case let .success(auth):
         EndpointRouter.token = auth.token

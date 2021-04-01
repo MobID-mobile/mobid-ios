@@ -36,7 +36,7 @@ class VerificationViewController: UIViewController {
     ])
 
     jitsiMeetViewController.leaveCompletion = { [weak self] in
-      self?.networkService.stopConference(completion: { [weak self] update in
+      self?.networkService.stopConference(callback: { [weak self] update in
         self?.networkService.stopVerificationStatusMonitoring()
       })
     }
