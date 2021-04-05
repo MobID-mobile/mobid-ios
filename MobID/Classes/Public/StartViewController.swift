@@ -92,7 +92,7 @@ public class StartViewController: UIViewController {
         case .success:
           self.startMonitoringStatus()
         case .failure:
-          self.showErrorAlert()
+          break
         }
       }
     }
@@ -117,7 +117,7 @@ private extension StartViewController {
         case .failure:
           self.showHideWaitingForConnection(show: false)
           self.networkService.stopVerificationStatusMonitoring()
-          self.showErrorAlert()
+          break
         }
       }
     }
