@@ -15,7 +15,7 @@ class VerificationViewController: UIViewController {
     view.backgroundColor = .white
     addJitsiMeetView()
 
-    setupVerificationUpdateTimer()
+    startVerificationStatusMonitoring()
   }
 
   override func viewDidDisappear(_ animated: Bool) {
@@ -35,10 +35,8 @@ class VerificationViewController: UIViewController {
       jitsiMeetViewController.view.bottomAnchor.constraint(equalTo: self.view.bottomAnchor),
     ])
 
-    jitsiMeetViewController.leaveCompletion = { [weak self] in
-      self?.networkService.stopConference(callback: { [weak self] update in
-        self?.networkService.stopVerificationStatusMonitoring()
-      })
+    jitsiMeetViewController.leaveCompletion = { [networkService] in
+      networkService.stopConference { _ in }
     }
   }
 }
@@ -58,7 +56,7 @@ private extension VerificationViewController {
     jitsiMeetViewController.join(serverURL: serverURL, room: room)
   }
 
-  func setupVerificationUpdateTimer() {
+  func startVerificationStatusMonitoring() {
     networkService.startVerificationStatusMonitoring { [weak self] response in
       DispatchQueue.main.async {
         guard let self = self else { return }
@@ -94,6 +92,7 @@ private extension VerificationViewController {
 
   func stopVerification() {
     jitsiMeetViewController.leave()
+    networkService.stopVerificationStatusMonitoring()
   }
 
   func finishVerification(model: Verification) {

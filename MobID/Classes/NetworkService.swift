@@ -14,9 +14,10 @@ class NetworkService {
   }
 
   // MARK: - Interface
-  func stopConference(callback: @escaping (Response<ConferenceUpdate>) -> Void) -> URLSessionDataTask? {
+  func stopConference(callback: @escaping (Response<ConferenceUpdate>) -> Void) {
     networkClient.stopConference() { result in
       print(result)
+      callback(result)
     }
   }
 
@@ -36,6 +37,7 @@ class NetworkService {
 
   // MARK: - Interface
   func startVerificationStatusMonitoring(callback: @escaping (Response<Verification>) -> Void) {
+    conferenceCompletionPollingTimer?.invalidate()
     conferenceCompletionPollingTimer = Timer.scheduledTimer(
       withTimeInterval: 3,
       repeats: true,
