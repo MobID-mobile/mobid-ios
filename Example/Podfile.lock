@@ -1,5 +1,5 @@
 PODS:
-  - MobID (0.1.9)
+  - MobID (0.2.0)
 
 DEPENDENCIES:
   - MobID (from `../`)
@@ -9,7 +9,7 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  MobID: 66307710253b374492f3fe9c2ba64f1ad3fc33f9
+  MobID: 441319ebf57cdecf3e4db1c0d3d1bbbcfc4101be
 
 PODFILE CHECKSUM: 7b5e3f37378dfa41988503d16403cbb34719faad
 
