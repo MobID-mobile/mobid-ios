@@ -8,12 +8,14 @@ enum EndpointRouter: HTTPEndpoint {
   static var host: String?
   static var token: String = ""
   static var verificationID: String = ""
+  static var username: String = ""
+  static var password: String = ""
 
   case auth(parameters: HTTPParameters)
   case verification
-  case photo(parameters: HTTPParameters)
   case patchVerification(parameters: HTTPParameters)
   case openConferences
+  case tokenAuth(parameters: HTTPParameters)
 }
 
 extension EndpointRouter {
@@ -40,7 +42,7 @@ extension EndpointRouter {
 
   var queryItems: HTTPQueryItems? {
     switch self {
-    case .auth, .verification, .photo, .patchVerification, .openConferences:
+    case .auth, .verification, .patchVerification, .openConferences, .tokenAuth:
       return nil
     }
   }
@@ -52,17 +54,17 @@ extension EndpointRouter {
     case .verification,
          .patchVerification:
       return "/api/v1.1/verifications/" + Self.verificationID + "/"
-    case .photo:
-      return "/api/v1.1/verifications/" + Self.verificationID + "/images/"
     case .openConferences:
       return "/api/v1.1/open_conferences/"
+    case .tokenAuth:
+      return "/api-token-auth/"
     }
   }
 
   var method: HTTPMethod {
     switch self {
     case .auth,
-         .photo:
+         .tokenAuth:
       return .post
     case .verification,
          .openConferences:
@@ -75,8 +77,8 @@ extension EndpointRouter {
   var params: HTTPParameters? {
     switch self {
     case let .auth(parameters),
-         let .photo(parameters),
-         let .patchVerification(parameters):
+         let .patchVerification(parameters),
+         let .tokenAuth(parameters):
       return parameters
     case .verification,
          .openConferences:
@@ -86,12 +88,12 @@ extension EndpointRouter {
 
   var headers: HTTPHeaders {
     switch self {
-    case .auth,
-         .openConferences:
+    case .tokenAuth:
       return [:]
     case .verification,
-         .photo,
-         .patchVerification:
+         .patchVerification,
+         .auth,
+         .openConferences:
       return ["authorization": "Bearer \(Self.token)"]
     }
   }

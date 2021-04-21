@@ -37,7 +37,7 @@ class ViewController: UIViewController {
   }
 
   private func loadOpenConferences() {
-    MobID.getOpenConferences() { [weak self] result in
+    MobID.getOpenConferences { [weak self] result in
       switch result {
       case let .success(openConferences):
         DispatchQueue.main.async {
@@ -68,16 +68,21 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
 
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     let id = conferences[indexPath.row]
-    let startViewController = StartViewController()
-    startViewController.conferenceID = id
-    navigationController?.pushViewController(startViewController, animated: true)
+    let viewController = VerificationViewController()
+    viewController.conferenceID = id
+    navigationController?.pushViewController(viewController, animated: true)
   }
 }
 
 
 extension ViewController: MobIDDelegate {
   func verificationStatus(_ status: VerificationStatus) {
-    print(status)
+    DispatchQueue.main.async {
+      print(status)
+      if status == .CONFERENCE_STOP {
+        self.navigationController?.popViewController(animated: true)
+      }
+    }
   }
 
   func errorOccurred(_ error: ClientError) {

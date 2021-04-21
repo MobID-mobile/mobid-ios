@@ -136,31 +136,14 @@ extension Client {
   }
 
   @discardableResult
-  func photo(image: UIImage,
-             type: PhotoType,
-             completion: @escaping (Response<Photo>) -> Void) -> URLSessionDataTask? {
-
-    let photoEndpoint = EndpointRouter.photo(
-      parameters: [
-        "type": type.rawValue,
-        "verification": EndpointRouter.verificationID
+  func tokenAuth(completion: @escaping (Response<TokenAuth>) -> Void) -> URLSessionDataTask? {
+    return perform(
+      EndpointRouter.tokenAuth(parameters: [
+        "username": EndpointRouter.username,
+        "password": EndpointRouter.password
       ]
+      ),
+      completion: completion
     )
-    
-    do {
-      let url = try photoEndpoint.asURLRequest().url!
-      let multipartRequest = try MultipartRequest.make(
-        url: url,
-        image: image,
-        type: type.rawValue,
-        verification: EndpointRouter.verificationID,
-        token: EndpointRouter.token
-      )
-
-      return performURLRequest(multipartRequest.0, completion: completion)
-    } catch {
-      completion(.init(result: .failure(.endpointError(error: error)), request: nil))
-      return nil
-    }
   }
 }

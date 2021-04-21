@@ -58,6 +58,7 @@ extension HTTPEndpoint {
       print(urlComponents.debugDescription)
       throw EndpointError.invalidURL(description: urlComponents.debugDescription)
     }
+
     return url
   }
 }

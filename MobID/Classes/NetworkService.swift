@@ -14,6 +14,23 @@ class NetworkService {
   }
 
   // MARK: - Interface
+  func openConferences(completion: @escaping (Response<OpenConferences>) -> Void) {
+    networkClient.openConferences(completion: completion)
+  }
+
+  func tokenAuth(callback: @escaping (ClientError?) -> Void) {
+    networkClient.tokenAuth {
+      switch $0.result {
+      case let .success(tokenAuth):
+        EndpointRouter.token = tokenAuth.token
+        callback(nil)
+      case let .failure(error):
+        MobID.delegate?.errorOccurred(error)
+        callback(error)
+      }
+    }
+  }
+
   func stopConference(callback: @escaping (Response<ConferenceUpdate>) -> Void) {
     networkClient.stopConference() { result in
       print(result)
@@ -25,7 +42,6 @@ class NetworkService {
     networkClient.auth(to: conferenceID) {
       switch $0.result {
       case let .success(auth):
-        EndpointRouter.token = auth.token
         EndpointRouter.verificationID = auth.verificationID
 
       case let .failure(error):

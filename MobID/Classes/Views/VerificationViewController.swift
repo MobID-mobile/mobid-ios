@@ -2,23 +2,45 @@
 
 import UIKit
 
-class VerificationViewController: UIViewController {
+public class VerificationViewController: UIViewController {
 
+  // MARK: - Public
+  public var conferenceID: String?
+  
   // MARK: - Private
   private let networkService = NetworkService()
   private var status: VerificationStatus = .WAIT_INVITE
   private lazy var jitsiMeetViewController = JitsiViewController()
 
+  private lazy var spinner: UIActivityIndicatorView = {
+    let view = UIActivityIndicatorView(style: .gray)
+    view.hidesWhenStopped = true
+
+    return view
+  }()
+
+  private lazy var waitingForAgentLabel: UILabel = {
+    let label = UILabel()
+    label.text = "Очікуємо підключення оператора"
+    label.sizeToFit()
+    label.textColor = UIColor.brandColor
+    label.translatesAutoresizingMaskIntoConstraints = false
+    label.isHidden = true
+    return label
+  }()
+
   // MARK: - Override
-  override func viewDidLoad() {
+  public override func viewDidLoad() {
     super.viewDidLoad()
     view.backgroundColor = .white
-    addJitsiMeetView()
 
-    startVerificationStatusMonitoring()
+    addJitsiMeetView()
+    addSubviews()
+
+    connectToVerification()
   }
 
-  override func viewDidDisappear(_ animated: Bool) {
+  public override func viewDidDisappear(_ animated: Bool) {
     super.viewDidDisappear(animated)
     stopVerification()
   }
@@ -35,8 +57,41 @@ class VerificationViewController: UIViewController {
       jitsiMeetViewController.view.bottomAnchor.constraint(equalTo: self.view.bottomAnchor),
     ])
 
+    jitsiMeetViewController.view.isHidden = true
+
     jitsiMeetViewController.leaveCompletion = { [networkService] in
       networkService.stopConference { _ in }
+    }
+  }
+
+  private func addSubviews() {
+
+    spinner.translatesAutoresizingMaskIntoConstraints = false
+    view.addSubview(spinner)
+
+    NSLayoutConstraint.activate([
+      spinner.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+      spinner.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 0),
+    ])
+
+    view.addSubview(waitingForAgentLabel)
+
+    NSLayoutConstraint.activate([
+      waitingForAgentLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+      waitingForAgentLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 30),
+    ])
+
+    waitingForAgentLabel.isHidden = true
+  }
+
+  private func showHideWaitingForConnection(show: Bool) {
+    switch show {
+    case true:
+      spinner.startAnimating()
+      waitingForAgentLabel.isHidden = false
+    case false:
+      spinner.stopAnimating()
+      waitingForAgentLabel.isHidden = true
     }
   }
 }
@@ -53,13 +108,32 @@ private extension VerificationViewController {
       return
     }
 
+    jitsiMeetViewController.view.isHidden = false
     jitsiMeetViewController.join(serverURL: serverURL, room: room)
   }
 
+  func connectToVerification() {
+    spinner.startAnimating()
+    networkService.auth(to: conferenceID) { [weak self] response in
+      DispatchQueue.main.async {
+        guard let self = self else { return }
+        self.spinner.stopAnimating()
+        switch response.result {
+        case .success:
+          self.startVerificationStatusMonitoring()
+        case .failure:
+          break
+        }
+      }
+    }
+  }
+
   func startVerificationStatusMonitoring() {
+    showHideWaitingForConnection(show: true)
     networkService.startVerificationStatusMonitoring { [weak self] response in
       DispatchQueue.main.async {
         guard let self = self else { return }
+        self.showHideWaitingForConnection(show: false)
 
         switch response.result {
         case let .success(verification):
@@ -80,7 +154,7 @@ private extension VerificationViewController {
     case .CONFERENCE_START:
       startJitsi(hostName: model.conference?.jitsiHost, room: model.conference?.jitsiRoom)
     case .CONFERENCE_STOP:
-      finishVerification(model: model)
+      stopVerification()
     case .WAIT_INVITE,
          .SELFIE_1_START,
          .SELFIE_2_START,
@@ -91,23 +165,8 @@ private extension VerificationViewController {
   }
 
   func stopVerification() {
+    jitsiMeetViewController.view.isHidden = true
     jitsiMeetViewController.leave()
     networkService.stopVerificationStatusMonitoring()
-  }
-
-  func finishVerification(model: Verification) {
-    stopVerification()
-
-    let dValue = model.score?.document
-    let fValue = model.score?.facialMatch
-    let lValue = model.score?.liveness
-
-    navigationController?.pushViewController(
-      EndViewController(
-        dValue: dValue.flatMap { Float($0) },
-        fValue: fValue.flatMap { Float($0) },
-        lValue: lValue.flatMap { Float($0) }
-      ),
-      animated: true)
   }
 }

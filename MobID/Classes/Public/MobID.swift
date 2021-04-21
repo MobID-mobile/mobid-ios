@@ -2,14 +2,18 @@
 
 import Foundation
 
-public struct MobIDHost {
-  public init(scheme: String, name: String) {
+public struct MobIDConfig {
+  public init(scheme: String, hostName: String, username: String, password: String) {
     self.scheme = scheme
-    self.name = name
+    self.hostName = hostName
+    self.username = username
+    self.password = password
   }
   
   public let scheme: String
-  public let name: String
+  public let hostName: String
+  public let username: String
+  public let password: String
 }
 
 public protocol MobIDDelegate {
@@ -22,19 +26,26 @@ public class MobID {
   // MARK: - Public
   public static var delegate: MobIDDelegate?
 
-
   // MARK: - Private
-  private static let networkClient = Client()
+  private static let networkService = NetworkService()
 
   // MARK: - Public
-  public static func configure(host: MobIDHost) {
-    EndpointRouter.host = host.name
-    EndpointRouter.scheme = host.scheme
+  public static func configure(with config: MobIDConfig) {
+    EndpointRouter.host = config.hostName
+    EndpointRouter.scheme = config.scheme
+    EndpointRouter.username = config.username
+    EndpointRouter.password = config.password
   }
 
   public static func getOpenConferences(completion: @escaping (Result<OpenConferences, ClientError>)-> Void) {
-    networkClient.openConferences {
-      completion($0.result)
+    networkService.tokenAuth { error in
+      if let error = error {
+        completion(.failure(error))
+      } else {
+        networkService.openConferences {
+          completion($0.result)
+        }
+      }
     }
   }
 }
