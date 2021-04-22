@@ -21,11 +21,11 @@ Pod::Spec.new do |s|
 TODO: Add long description of the pod here.
                        DESC
 
-  s.homepage         = 'https://github.com/TheMobID/mobid-ios'
+  s.homepage         = 'https://github.com/MobID-mobile/mobid-ios'
   # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'AleksandrPavliuk' => 'pavliuk.aleksandr@gmail.com' }
-  s.source           = { :git => 'https://github.com/TheMobID/mobid-ios.git', :tag => s.version.to_s }
+  s.source           = { :git => 'https://github.com/MobID-mobile/mobid-ios.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
   s.ios.deployment_target = '11.0'
