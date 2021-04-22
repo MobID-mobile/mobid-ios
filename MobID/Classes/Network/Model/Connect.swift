@@ -2,7 +2,7 @@
 
 import Foundation
 
-struct Auth: Codable {
+struct Connect: Codable {
   let verificationID: String
   let status: VerificationStatus
   let isActive, isVerifiedByAgent: Bool?

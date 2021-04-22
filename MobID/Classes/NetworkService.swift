@@ -22,7 +22,7 @@ class NetworkService {
     networkClient.tokenAuth {
       switch $0.result {
       case let .success(tokenAuth):
-        EndpointRouter.token = tokenAuth.token
+        MobIDConfig.token = tokenAuth.token
         callback(nil)
       case let .failure(error):
         MobID.delegate?.errorOccurred(error)
@@ -38,11 +38,11 @@ class NetworkService {
     }
   }
 
-  func auth(to conferenceID: String?, callback: @escaping (Response<Auth>) -> Void) {
-    networkClient.auth(to: conferenceID) {
+  func connect(to conferenceID: String?, callback: @escaping (Response<Connect>) -> Void) {
+    networkClient.connect(to: conferenceID) {
       switch $0.result {
-      case let .success(auth):
-        EndpointRouter.verificationID = auth.verificationID
+      case let .success(connect):
+        MobIDConfig.verificationID = connect.verificationID
 
       case let .failure(error):
         MobID.delegate?.errorOccurred(error)

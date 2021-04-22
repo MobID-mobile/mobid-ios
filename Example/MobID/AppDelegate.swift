@@ -16,13 +16,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 
-    let config = MobIDConfig(
+    MobID.configure(
       scheme: "https",
       hostName: "api.mobid.ai",
       username: "fae6f2b2-0586-4b96-9dfe-5ab5ee014112",
       password: "xXbyVU9LabFTCN9"
     )
-    MobID.configure(with: config)
 
     return true
   }

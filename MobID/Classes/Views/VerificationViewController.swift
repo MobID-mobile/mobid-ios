@@ -114,7 +114,7 @@ private extension VerificationViewController {
 
   func connectToVerification() {
     spinner.startAnimating()
-    networkService.auth(to: conferenceID) { [weak self] response in
+    networkService.connect(to: conferenceID) { [weak self] response in
       DispatchQueue.main.async {
         guard let self = self else { return }
         self.spinner.stopAnimating()

@@ -90,10 +90,10 @@ class Client {
 extension Client {
 
   @discardableResult
-  func auth(to conferenceID: String?, completion: @escaping (Response<Auth>) -> Void) -> URLSessionDataTask? {
+  func connect(to conferenceID: String?, completion: @escaping (Response<Connect>) -> Void) -> URLSessionDataTask? {
 
     return perform(
-      EndpointRouter.auth(
+      EndpointRouter.connect(
         parameters: [
           "conference_id": conferenceID ?? "null",
           "status": VerificationStatus.WAIT_INVITE.rawValue
@@ -118,7 +118,7 @@ extension Client {
     return perform(
       EndpointRouter.patchVerification(
         parameters: [
-          "verification": EndpointRouter.verificationID,
+          "verification": MobIDConfig.verificationID,
           "status": VerificationStatus.CONFERENCE_STOP.rawValue
         ]
       ),
@@ -139,8 +139,8 @@ extension Client {
   func tokenAuth(completion: @escaping (Response<TokenAuth>) -> Void) -> URLSessionDataTask? {
     return perform(
       EndpointRouter.tokenAuth(parameters: [
-        "username": EndpointRouter.username,
-        "password": EndpointRouter.password
+        "username": MobIDConfig.username,
+        "password": MobIDConfig.password
       ]
       ),
       completion: completion

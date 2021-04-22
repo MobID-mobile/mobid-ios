@@ -3,15 +3,7 @@
 import Foundation
 
 enum EndpointRouter: HTTPEndpoint {
-
-  static var scheme: String?
-  static var host: String?
-  static var token: String = ""
-  static var verificationID: String = ""
-  static var username: String = ""
-  static var password: String = ""
-
-  case auth(parameters: HTTPParameters)
+  case connect(parameters: HTTPParameters)
   case verification
   case patchVerification(parameters: HTTPParameters)
   case openConferences
@@ -20,7 +12,7 @@ enum EndpointRouter: HTTPEndpoint {
 
 extension EndpointRouter {
   var scheme: String {
-    guard let scheme = Self.scheme else {
+    guard let scheme = MobIDConfig.scheme else {
       assertionFailure("Scheme should exist")
       return ""
     }
@@ -28,7 +20,7 @@ extension EndpointRouter {
   }
 
   var host: String {
-    guard let host = Self.host else {
+    guard let host = MobIDConfig.host else {
       assertionFailure("Host should exist")
       return ""
     }
@@ -42,18 +34,18 @@ extension EndpointRouter {
 
   var queryItems: HTTPQueryItems? {
     switch self {
-    case .auth, .verification, .patchVerification, .openConferences, .tokenAuth:
+    case .connect, .verification, .patchVerification, .openConferences, .tokenAuth:
       return nil
     }
   }
 
   var path: String {
     switch self {
-    case .auth:
+    case .connect:
       return "/api/v1.1/verifications/"
     case .verification,
          .patchVerification:
-      return "/api/v1.1/verifications/" + Self.verificationID + "/"
+      return "/api/v1.1/verifications/" + MobIDConfig.verificationID + "/"
     case .openConferences:
       return "/api/v1.1/open_conferences/"
     case .tokenAuth:
@@ -63,7 +55,7 @@ extension EndpointRouter {
 
   var method: HTTPMethod {
     switch self {
-    case .auth,
+    case .connect,
          .tokenAuth:
       return .post
     case .verification,
@@ -76,7 +68,7 @@ extension EndpointRouter {
 
   var params: HTTPParameters? {
     switch self {
-    case let .auth(parameters),
+    case let .connect(parameters),
          let .patchVerification(parameters),
          let .tokenAuth(parameters):
       return parameters
@@ -92,9 +84,9 @@ extension EndpointRouter {
       return [:]
     case .verification,
          .patchVerification,
-         .auth,
+         .connect,
          .openConferences:
-      return ["authorization": "Bearer \(Self.token)"]
+      return ["authorization": "Bearer \(MobIDConfig.token)"]
     }
   }
 }
