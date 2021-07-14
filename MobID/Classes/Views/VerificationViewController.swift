@@ -29,6 +29,14 @@ public class VerificationViewController: UIViewController {
     return label
   }()
 
+  // MARK: - Deinit
+  deinit {
+    NotificationCenter.default.removeObserver(
+      self,
+      name: UIApplication.didEnterBackgroundNotification,
+      object: nil)
+  }
+
   // MARK: - Override
   public override func viewDidLoad() {
     super.viewDidLoad()
@@ -38,6 +46,7 @@ public class VerificationViewController: UIViewController {
     addSubviews()
 
     connectToVerification()
+    setupAppLifecycleNotifications()
   }
 
   public override func viewDidDisappear(_ animated: Bool) {
@@ -65,7 +74,6 @@ public class VerificationViewController: UIViewController {
   }
 
   private func addSubviews() {
-
     spinner.translatesAutoresizingMaskIntoConstraints = false
     view.addSubview(spinner)
 
@@ -168,5 +176,25 @@ private extension VerificationViewController {
     jitsiMeetViewController.view.isHidden = true
     jitsiMeetViewController.leave()
     networkService.stopVerificationStatusMonitoring()
+  }
+}
+
+// MARK: - App Lifecycle Notifications
+private extension VerificationViewController {
+  func setupAppLifecycleNotifications() {
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(applicationDidEnterBackground),
+      name: UIApplication.didEnterBackgroundNotification,
+      object: nil)
+  }
+
+  @objc private func applicationDidEnterBackground() {
+    guard isViewLoaded, view.window != nil else {
+      return
+    }
+    DispatchQueue.main.async {
+      self.jitsiMeetViewController.leave()
+    }
   }
 }

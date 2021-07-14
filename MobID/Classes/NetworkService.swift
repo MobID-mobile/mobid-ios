@@ -33,7 +33,6 @@ class NetworkService {
 
   func stopConference(callback: @escaping (Response<ConferenceUpdate>) -> Void) {
     networkClient.stopConference() { result in
-      print(result)
       callback(result)
     }
   }

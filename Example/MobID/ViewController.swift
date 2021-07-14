@@ -78,7 +78,6 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
 extension ViewController: MobIDDelegate {
   func verificationStatus(_ status: VerificationStatus) {
     DispatchQueue.main.async {
-      print(status)
       if status == .CONFERENCE_STOP {
         self.navigationController?.popViewController(animated: true)
       }
