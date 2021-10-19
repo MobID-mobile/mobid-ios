@@ -299,7 +299,7 @@
 				"${PODS_ROOT}/Target Support Files/Pods-MobID_Example/Pods-MobID_Example-frameworks.sh",
 				"${PODS_ROOT}/../../Frameworks/WebRTC.framework",
 				"${BUILT_PRODUCTS_DIR}/MobID/MobID.framework",
-				"${PODS_XCFRAMEWORKS_BUILD_DIR}/JitsiMeetSDK/JitsiMeetSDK.framework/JitsiMeetSDK",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/MobID/JitsiMeetSDK.framework/JitsiMeetSDK",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (

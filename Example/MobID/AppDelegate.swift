@@ -20,8 +20,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     MobID.configure(
       scheme: "https",
       hostName: "api.mobid.ai",
-      username: "fae6f2b2-0586-4b96-9dfe-5ab5ee014112",
-      password: "xXbyVU9LabFTCN9"
+      username: "admin",
+      password: "admin123"
     )
 
     return true
