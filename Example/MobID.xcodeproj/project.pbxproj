@@ -297,14 +297,14 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-MobID_Example/Pods-MobID_Example-frameworks.sh",
-				"${PODS_ROOT}/../../Frameworks/WebRTC.framework",
 				"${BUILT_PRODUCTS_DIR}/MobID/MobID.framework",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/MobID/WebRTC.framework/WebRTC",
 				"${PODS_XCFRAMEWORKS_BUILD_DIR}/MobID/JitsiMeetSDK.framework/JitsiMeetSDK",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/WebRTC.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MobID.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/WebRTC.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/JitsiMeetSDK.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;

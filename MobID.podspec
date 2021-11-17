@@ -41,9 +41,7 @@ TODO: Add long description of the pod here.
   # s.public_header_files = 'Pod/Classes/**/*.h'
    s.frameworks = 'UIKit'
 
-   s.ios.vendored_frameworks = 'Frameworks/JitsiMeetSDK.xcframework', 'Frameworks/WebRTC.framework'
-   
-#   s.dependency 'ALCameraViewController', '3.1'
+   s.ios.vendored_frameworks = 'Frameworks/WebRTC.xcframework', 'Frameworks/JitsiMeetSDK.xcframework'
 
    s.pod_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
    s.user_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }

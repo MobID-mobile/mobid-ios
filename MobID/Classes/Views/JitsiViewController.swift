@@ -21,7 +21,7 @@ class JitsiViewController: UIViewController, JitsiMeetViewDelegate {
   func join(serverURL: URL, room: String) {
     let jitsiMeetConferenceOptions = JitsiMeetConferenceOptions.fromBuilder { (builder) in
       builder.serverURL = serverURL
-      builder.audioOnly = false
+//      builder.audioOnly = false
       builder.room = room
     }
 
